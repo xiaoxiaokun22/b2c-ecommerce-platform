@@ -18,6 +18,7 @@
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item command="system">系统管理</el-dropdown-item>
                   <el-dropdown-item command="profile">个人中心</el-dropdown-item>
                   <el-dropdown-item command="orders">我的订单</el-dropdown-item>
                   <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
@@ -42,6 +43,10 @@
           <div class="hero-actions">
             <el-button type="primary" size="large" @click="browseProducts">
               开始购物
+            </el-button>
+            <el-button v-if="userStore.isLoggedIn" type="success" size="large" @click="goToSystem">
+              <el-icon><Setting /></el-icon>
+              系统管理
             </el-button>
             <el-button size="large" @click="learnMore">
               了解更多
@@ -82,7 +87,7 @@
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { ArrowDown, User, ShoppingCart, CreditCard, Van } from '@element-plus/icons-vue'
+import { ArrowDown, User, ShoppingCart, CreditCard, Van, Setting } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -90,6 +95,9 @@ const userStore = useUserStore()
 // 处理下拉菜单命令
 const handleDropdown = (command: string) => {
   switch (command) {
+    case 'system':
+      router.push('/system')
+      break
     case 'profile':
       router.push('/profile')
       break
@@ -110,6 +118,11 @@ const browseProducts = () => {
 // 了解更多
 const learnMore = () => {
   ElMessage.info('关于我们页面开发中...')
+}
+
+// 进入系统管理
+const goToSystem = () => {
+  router.push('/system')
 }
 </script>
 

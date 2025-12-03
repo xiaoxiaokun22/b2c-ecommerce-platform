@@ -1,0 +1,144 @@
+/* 统一的表格操作按钮样式 */
+.table-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  min-height: 32px;
+}
+
+.table-action-buttons .el-button {
+  margin: 0 !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  height: auto !important;
+  min-height: 24px !important;
+  border-radius: 4px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+.table-action-buttons .el-button .el-icon {
+  margin-right: 4px !important;
+  font-size: 12px !important;
+}
+
+/* 表格单元格样式调整 */
+:deep(.el-table .cell) {
+  padding: 0 12px !important;
+  line-height: normal !important;
+}
+
+:deep(.el-table__row .el-table__cell) {
+  padding: 8px 0 !important;
+}
+
+:deep(.el-table--small .el-table__cell) {
+  padding: 6px 0 !important;
+}
+
+/* 防止按钮换行 */
+:deep(.el-table .el-table__cell) {
+  overflow: visible !important;
+}
+
+/* 确保操作列有足够宽度 */
+:deep(.el-table__fixed-right) {
+  z-index: 100 !important;
+}
+
+/* 弹出确认框样式 */
+:deep(.el-popconfirm__reference) {
+  display: inline-flex !important;
+}
+
+/* 响应式处理 */
+@media (max-width: 1400px) {
+  .table-action-buttons {
+    gap: 4px;
+  }
+
+  .table-action-buttons .el-button {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .table-action-buttons .el-button .el-icon {
+    margin-right: 2px !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .table-action-buttons {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  .table-action-buttons .el-button {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-action-buttons .el-button span {
+    display: none !important;
+  }
+
+  .table-action-buttons .el-button .el-icon {
+    margin-right: 0 !important;
+  }
+
+  .table-action-buttons .el-button {
+    padding: 4px !important;
+    min-width: 28px !important;
+    width: 28px !important;
+    justify-content: center !important;
+  }
+}
+
+/* 针对不同数量按钮的布局优化 */
+.table-action-buttons[data-buttons="4"] {
+  gap: 6px;
+}
+
+.table-action-buttons[data-buttons="4"] .el-button {
+  padding: 3px 8px !important;
+  font-size: 11px !important;
+}
+
+.table-action-buttons[data-buttons="5"] {
+  gap: 4px;
+}
+
+.table-action-buttons[data-buttons="5"] .el-button {
+  padding: 2px 6px !important;
+  font-size: 10px !important;
+}
+
+/* link类型按钮特殊样式 */
+.table-action-buttons .el-button.is-link {
+  padding: 2px 6px !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.table-action-buttons .el-button.is-link:hover {
+  background-color: var(--el-color-primary-light-9) !important;
+}
+
+/* 危险操作按钮样式 */
+.table-action-buttons .el-button--danger.is-link:hover {
+  background-color: var(--el-color-danger-light-9) !important;
+}
+
+.table-action-buttons .el-button--success.is-link:hover {
+  background-color: var(--el-color-success-light-9) !important;
+}
+
+.table-action-buttons .el-button--warning.is-link:hover {
+  background-color: var(--el-color-warning-light-9) !important;
+}
