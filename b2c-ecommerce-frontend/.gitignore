@@ -1,0 +1,73 @@
+# ========== 依赖包目录 ==========
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========== 构建输出 ==========
+dist/
+build/
+.output/
+.next/
+.nuxt/
+
+# ========== Vite 缓存 ==========
+.vite/
+.cache/
+
+# ========== TypeScript ==========
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ========== 自动生成文件 ==========
+auto-imports.d.ts
+components.d.ts
+.eslintrc-auto-import.json
+
+# ========== IDE 和编辑器 ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ========== 操作系统生成文件 ==========
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ========== 日志文件 ==========
+*.log
+logs/
+
+# ========== 测试覆盖率 ==========
+coverage/
+.nyc_output/
+
+# ========== 环境配置 ==========
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ========== 备份和临时文件 ==========
+*.bak
+*.backup
+*.old
+*.tmp
+*.temp
+
+# ========== ESLint 缓存 ==========
+.eslintcache
+
+# ========== 包管理器锁定文件 (根据团队约定) ==========
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
