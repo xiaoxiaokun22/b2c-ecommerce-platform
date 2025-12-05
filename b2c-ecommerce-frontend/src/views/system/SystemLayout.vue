@@ -44,6 +44,58 @@
               <span>商品评价</span>
             </el-menu-item>
           </el-sub-menu>
+
+          <!-- 订单管理 -->
+          <el-sub-menu index="orders">
+            <template #title>
+              <el-icon><ShoppingCart /></el-icon>
+              <span>订单管理</span>
+            </template>
+            <el-menu-item index="/system/orders">
+              <el-icon><List /></el-icon>
+              <span>订单列表</span>
+            </el-menu-item>
+            <el-menu-item index="/system/refunds">
+              <el-icon><Money /></el-icon>
+              <span>退款管理</span>
+            </el-menu-item>
+            <el-menu-item index="/system/after-sales">
+              <el-icon><Service /></el-icon>
+              <span>售后服务</span>
+            </el-menu-item>
+            <el-menu-item index="/system/order-statistics">
+              <el-icon><TrendCharts /></el-icon>
+              <span>订单统计</span>
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- 支付管理 -->
+          <el-sub-menu index="payments">
+            <template #title>
+              <el-icon><CreditCard /></el-icon>
+              <span>支付管理</span>
+            </template>
+            <el-menu-item index="/system/payment-channels">
+              <el-icon><Wallet /></el-icon>
+              <span>支付渠道</span>
+            </el-menu-item>
+            <el-menu-item index="/system/payment-security">
+              <el-icon><Key /></el-icon>
+              <span>支付安全</span>
+            </el-menu-item>
+            <el-menu-item index="/system/payment-refunds">
+              <el-icon><RefreshLeft /></el-icon>
+              <span>退款处理</span>
+            </el-menu-item>
+            <el-menu-item index="/system/reconciliation">
+              <el-icon><ScaleToOriginal /></el-icon>
+              <span>对账系统</span>
+            </el-menu-item>
+            <el-menu-item index="/system/payment-statistics">
+              <el-icon><DataAnalysis /></el-icon>
+              <span>支付统计</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
 
@@ -90,7 +142,11 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import { User, UserFilled, Lock, ArrowDown, Goods, List, Files, ChatDotRound } from '@element-plus/icons-vue'
+import {
+  User, UserFilled, Lock, ArrowDown, Goods, List, Files, ChatDotRound,
+  ShoppingCart, Money, Service, TrendCharts, CreditCard, Wallet, Key,
+  RefreshLeft, ScaleToOriginal, DataAnalysis
+} from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -140,6 +196,9 @@ const handleLogout = async () => {
 
 // 初始化
 onMounted(() => {
+  // 初始化用户信息
+  userStore.initUserInfo()
+
   // 如果用户未登录，跳转到登录页
   if (!userStore.isLoggedIn) {
     router.push('/login')
@@ -177,46 +236,69 @@ onMounted(() => {
   background-color: #304156;
 }
 
+/* 顶级菜单项样式 */
 .system-menu .el-menu-item {
-  color: #bfcbd9;
+  color: #ff9800 !important;
   border-bottom: 1px solid #1a2533;
+  background-color: transparent !important;
 }
 
 .system-menu .el-menu-item:hover {
-  background-color: #263445;
-  color: white;
+  background-color: #263445 !important;
+  color: #ff9800 !important;
 }
 
 .system-menu .el-menu-item.is-active {
-  background-color: #409eff;
-  color: white;
+  background-color: #ff9800 !important;
+  color: white !important;
 }
 
-.system-menu .el-menu-item .el-icon {
-  margin-right: 6px;
-  font-size: 16px;
+/* 子菜单标题样式 */
+.system-menu .el-sub-menu__title {
+  color: #ff9800 !important;
+  border-bottom: 1px solid #1a2533;
+  background-color: transparent !important;
 }
 
-.system-menu .el-menu-item span {
-  font-size: 14px;
+.system-menu .el-sub-menu__title:hover {
+  background-color: #263445 !important;
+  color: #ff9800 !important;
 }
 
-.system-menu .el-sub-menu__title .el-icon {
-  margin-right: 6px;
-  font-size: 16px;
+.system-menu .el-sub-menu.is-opened .el-sub-menu__title {
+  color: #ff9800 !important;
 }
 
-.system-menu .el-sub-menu__title span {
-  font-size: 14px;
-}
-
+/* 子菜单项样式 - 使用更强的选择器确保样式生效 */
 .system-menu .el-sub-menu .el-menu-item {
   padding-left: 45px !important;
-  font-size: 13px;
+  font-size: 14px !important;
+  color: #bfcbd9 !important;
+  background-color: transparent !important;
 }
 
+.system-menu .el-sub-menu .el-menu-item:hover {
+  background-color: #263445 !important;
+  color: white !important;
+}
+
+.system-menu .el-sub-menu .el-menu-item.is-active {
+  background-color: #409eff !important;
+  color: white !important;
+}
+
+/* 图标样式统一 */
+.system-menu .el-menu-item .el-icon,
+.system-menu .el-sub-menu__title .el-icon,
 .system-menu .el-sub-menu .el-menu-item .el-icon {
-  margin-right: 4px;
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+/* 文字样式统一 */
+.system-menu .el-menu-item span,
+.system-menu .el-sub-menu__title span,
+.system-menu .el-sub-menu .el-menu-item span {
   font-size: 14px;
 }
 

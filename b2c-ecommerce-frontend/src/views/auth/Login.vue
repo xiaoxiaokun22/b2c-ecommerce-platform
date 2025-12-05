@@ -150,7 +150,7 @@ const handleLogin = async () => {
         localStorage.removeItem('rememberUsername')
       }
 
-      router.push('/')
+      router.push('/system')
     }
   } catch (error) {
     console.error('登录失败:', error)

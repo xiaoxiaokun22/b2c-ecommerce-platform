@@ -84,6 +84,68 @@ const router = createRouter({
           name: 'system.product-reviews',
           component: () => import('@/views/system/products/ProductReviewManagement.vue'),
           meta: { requiresAuth: true, title: '商品评价' }
+        },
+        // 订单管理模块
+        {
+          path: 'orders',
+          name: 'system.orders',
+          component: () => import('@/views/system/orders/OrderManagement.vue'),
+          meta: { requiresAuth: true, title: '订单管理' }
+        },
+        {
+          path: 'orders/detail/:id',
+          name: 'system.orders.detail',
+          component: () => import('@/views/system/orders/OrderDetail.vue'),
+          meta: { requiresAuth: true, title: '订单详情' }
+        },
+        {
+          path: 'refunds',
+          name: 'system.refunds',
+          component: () => import('@/views/system/orders/RefundManagement.vue'),
+          meta: { requiresAuth: true, title: '退款管理' }
+        },
+        {
+          path: 'after-sales',
+          name: 'system.after-sales',
+          component: () => import('@/views/system/orders/AfterSaleManagement.vue'),
+          meta: { requiresAuth: true, title: '售后服务' }
+        },
+        {
+          path: 'order-statistics',
+          name: 'system.order-statistics',
+          component: () => import('@/views/system/orders/OrderStatistics.vue'),
+          meta: { requiresAuth: true, title: '订单统计' }
+        },
+        // 支付管理模块
+        {
+          path: 'payment-channels',
+          name: 'system.payment-channels',
+          component: () => import('@/views/system/payments/PaymentChannelManagement.vue'),
+          meta: { requiresAuth: true, title: '支付渠道管理' }
+        },
+        {
+          path: 'payment-security',
+          name: 'system.payment-security',
+          component: () => import('@/views/system/payments/PaymentSecurityManagement.vue'),
+          meta: { requiresAuth: true, title: '支付安全管理' }
+        },
+        {
+          path: 'payment-refunds',
+          name: 'system.payment-refunds',
+          component: () => import('@/views/system/payments/RefundManagement.vue'),
+          meta: { requiresAuth: true, title: '退款处理' }
+        },
+        {
+          path: 'reconciliation',
+          name: 'system.reconciliation',
+          component: () => import('@/views/system/payments/ReconciliationManagement.vue'),
+          meta: { requiresAuth: true, title: '对账系统' }
+        },
+        {
+          path: 'payment-statistics',
+          name: 'system.payment-statistics',
+          component: () => import('@/views/system/payments/PaymentStatistics.vue'),
+          meta: { requiresAuth: true, title: '支付统计分析' }
         }
       ]
     }

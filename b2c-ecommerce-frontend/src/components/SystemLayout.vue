@@ -24,6 +24,50 @@
             <el-icon><Lock /></el-icon>
             <span>权限管理</span>
           </el-menu-item>
+
+          <!-- 商品管理 -->
+          <el-sub-menu index="products">
+            <template #title>
+              <el-icon><Goods /></el-icon>
+              <span>商品管理</span>
+            </template>
+            <el-menu-item index="/system/products">
+              <el-icon><Box /></el-icon>
+              <span>商品列表</span>
+            </el-menu-item>
+            <el-menu-item index="/system/categories">
+              <el-icon><Menu /></el-icon>
+              <span>商品分类</span>
+            </el-menu-item>
+            <el-menu-item index="/system/product-reviews">
+              <el-icon><ChatDotRound /></el-icon>
+              <span>商品评价</span>
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- 订单管理 -->
+          <el-sub-menu index="orders">
+            <template #title>
+              <el-icon><ShoppingCart /></el-icon>
+              <span>订单管理</span>
+            </template>
+            <el-menu-item index="/system/orders">
+              <el-icon><List /></el-icon>
+              <span>订单列表</span>
+            </el-menu-item>
+            <el-menu-item index="/system/refunds">
+              <el-icon><Money /></el-icon>
+              <span>退款管理</span>
+            </el-menu-item>
+            <el-menu-item index="/system/after-sales">
+              <el-icon><Service /></el-icon>
+              <span>售后服务</span>
+            </el-menu-item>
+            <el-menu-item index="/system/order-statistics">
+              <el-icon><TrendCharts /></el-icon>
+              <span>订单统计</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
 
@@ -70,7 +114,10 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import { User, UserFilled, Lock, ArrowDown } from '@element-plus/icons-vue'
+import {
+  User, UserFilled, Lock, ArrowDown, Goods, Box, Menu, ChatDotRound,
+  ShoppingCart, List, Money, Service, TrendCharts
+} from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -169,6 +216,14 @@ onMounted(() => {
 }
 
 .system-menu .el-menu-item .el-icon {
+  margin-right: 8px;
+}
+
+.system-menu .el-sub-menu .el-sub-menu__title .el-icon {
+  margin-right: 8px;
+}
+
+.system-menu .el-sub-menu .el-menu-item .el-icon {
   margin-right: 8px;
 }
 

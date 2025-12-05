@@ -5,7 +5,8 @@
       "Bash(mkdir:*)",
       "Bash(npm create vue:*)",
       "Bash(npm create:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
