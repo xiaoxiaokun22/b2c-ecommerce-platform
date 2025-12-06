@@ -96,6 +96,58 @@
               <span>支付统计</span>
             </el-menu-item>
           </el-sub-menu>
+
+          <!-- 库存管理 -->
+          <el-sub-menu index="inventory">
+            <template #title>
+              <el-icon><Box /></el-icon>
+              <span>库存管理</span>
+            </template>
+            <el-menu-item index="/system/inventory">
+              <el-icon><List /></el-icon>
+              <span>库存列表</span>
+            </el-menu-item>
+            <el-menu-item index="/system/inventory/alert">
+              <el-icon><Warning /></el-icon>
+              <span>库存预警</span>
+            </el-menu-item>
+            <el-menu-item index="/system/inventory/adjust">
+              <el-icon><EditPen /></el-icon>
+              <span>库存调整</span>
+            </el-menu-item>
+            <el-menu-item index="/system/inventory/analysis">
+              <el-icon><TrendCharts /></el-icon>
+              <span>库存分析</span>
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- 营销管理 -->
+          <el-sub-menu index="marketing">
+            <template #title>
+              <el-icon><Present /></el-icon>
+              <span>营销管理</span>
+            </template>
+            <el-menu-item index="/system/promotions">
+              <el-icon><Promotion /></el-icon>
+              <span>促销活动</span>
+            </el-menu-item>
+            <el-menu-item index="/system/coupons">
+              <el-icon><Ticket /></el-icon>
+              <span>优惠券</span>
+            </el-menu-item>
+            <el-menu-item index="/system/seckill">
+              <el-icon><Timer /></el-icon>
+              <span>秒杀活动</span>
+            </el-menu-item>
+            <el-menu-item index="/system/group-buying">
+              <el-icon><UserFilled /></el-icon>
+              <span>团购活动</span>
+            </el-menu-item>
+            <el-menu-item index="/system/marketing-analysis">
+              <el-icon><DataAnalysis /></el-icon>
+              <span>营销分析</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
 
@@ -145,7 +197,8 @@ import { ElMessage } from 'element-plus'
 import {
   User, UserFilled, Lock, ArrowDown, Goods, List, Files, ChatDotRound,
   ShoppingCart, Money, Service, TrendCharts, CreditCard, Wallet, Key,
-  RefreshLeft, ScaleToOriginal, DataAnalysis
+  RefreshLeft, ScaleToOriginal, DataAnalysis, Box, Warning, EditPen,
+  Present, Promotion, Ticket, Timer
 } from '@element-plus/icons-vue'
 
 const route = useRoute()

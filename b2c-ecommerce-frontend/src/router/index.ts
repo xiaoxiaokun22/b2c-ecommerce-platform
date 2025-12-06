@@ -146,6 +146,98 @@ const router = createRouter({
           name: 'system.payment-statistics',
           component: () => import('@/views/system/payments/PaymentStatistics.vue'),
           meta: { requiresAuth: true, title: '支付统计分析' }
+        },
+        // 库存管理模块
+        {
+          path: 'inventory',
+          name: 'system.inventory',
+          component: () => import('@/views/system/inventory/InventoryList.vue'),
+          meta: { requiresAuth: true, title: '库存管理' }
+        },
+        {
+          path: 'inventory/detail/:id',
+          name: 'system.inventory.detail',
+          component: () => import('@/views/system/inventory/InventoryDetail.vue'),
+          meta: { requiresAuth: true, title: '库存详情' }
+        },
+        {
+          path: 'inventory/alert',
+          name: 'system.inventory.alert',
+          component: () => import('@/views/system/inventory/InventoryAlert.vue'),
+          meta: { requiresAuth: true, title: '库存预警' }
+        },
+        {
+          path: 'inventory/adjust',
+          name: 'system.inventory.adjust',
+          component: () => import('@/views/system/inventory/InventoryAdjust.vue'),
+          meta: { requiresAuth: true, title: '库存调整' }
+        },
+        {
+          path: 'inventory/analysis',
+          name: 'system.inventory.analysis',
+          component: () => import('@/views/system/inventory/InventoryAnalysis.vue'),
+          meta: { requiresAuth: true, title: '库存分析' }
+        },
+        // 营销管理模块
+        {
+          path: 'promotions',
+          name: 'system.promotions',
+          component: () => import('@/views/system/marketing/PromotionList.vue'),
+          meta: { requiresAuth: true, title: '促销活动' }
+        },
+        {
+          path: 'promotions/create',
+          name: 'system.promotions.create',
+          component: () => import('@/views/system/marketing/PromotionForm.vue'),
+          meta: { requiresAuth: true, title: '创建促销活动' }
+        },
+        {
+          path: 'promotions/edit/:id',
+          name: 'system.promotions.edit',
+          component: () => import('@/views/system/marketing/PromotionForm.vue'),
+          meta: { requiresAuth: true, title: '编辑促销活动' }
+        },
+        {
+          path: 'coupons',
+          name: 'system.coupons',
+          component: () => import('@/views/system/marketing/CouponList.vue'),
+          meta: { requiresAuth: true, title: '优惠券管理' }
+        },
+        {
+          path: 'coupons/create',
+          name: 'system.coupons.create',
+          component: () => import('@/views/system/marketing/CouponForm.vue'),
+          meta: { requiresAuth: true, title: '创建优惠券' }
+        },
+        {
+          path: 'seckill',
+          name: 'system.seckill',
+          component: () => import('@/views/system/marketing/SeckillList.vue'),
+          meta: { requiresAuth: true, title: '秒杀活动' }
+        },
+        {
+          path: 'seckill/create',
+          name: 'system.seckill.create',
+          component: () => import('@/views/system/marketing/SeckillForm.vue'),
+          meta: { requiresAuth: true, title: '创建秒杀活动' }
+        },
+        {
+          path: 'group-buying',
+          name: 'system.group-buying',
+          component: () => import('@/views/system/marketing/GroupBuyingList.vue'),
+          meta: { requiresAuth: true, title: '团购活动' }
+        },
+        {
+          path: 'group-buying/create',
+          name: 'system.group-buying.create',
+          component: () => import('@/views/system/marketing/GroupBuyingForm.vue'),
+          meta: { requiresAuth: true, title: '创建团购活动' }
+        },
+        {
+          path: 'marketing-analysis',
+          name: 'system.marketing-analysis',
+          component: () => import('@/views/system/marketing/MarketingAnalysis.vue'),
+          meta: { requiresAuth: true, title: '营销数据分析' }
         }
       ]
     }
