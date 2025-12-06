@@ -222,13 +222,15 @@
       <!-- 分页 -->
       <div class="pagination-section">
         <el-pagination
-          v-model:current-page="pagination.page"
-          v-model:page-size="pagination.pageSize"
+          :current-page="pagination.page"
+          :page-size="pagination.pageSize"
           :total="pagination.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="handlePageSizeChange"
           @current-change="handlePageChange"
+          @update:current-page="pagination.page = $event"
+          @update:page-size="pagination.pageSize = $event"
         />
       </div>
     </div>
@@ -411,8 +413,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Refresh, Search, Calendar, SuccessFilled, Clock, Warning } from '@element-plus/icons-vue'
-import { reconciliationApi } from '@/api/payment'
-import type { ReconciliationRecord, ReconciliationDifference } from '@/types/payment'
+import { reconciliationApi, type ReconciliationRecord, type ReconciliationDifference } from '../../../api/payment'
 
 // 响应式数据
 const loading = ref(false)
@@ -494,7 +495,7 @@ const loadData = async () => {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    import('@/api/mock/payment').then(({ mockReconciliationRecords }) => {
+    import('../../../api/mock/payment').then(({ mockReconciliationRecords }) => {
       let filteredData = mockReconciliationRecords
 
       // 应用搜索过滤
@@ -533,7 +534,7 @@ const loadDifferences = async (reconciliationId: string) => {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 300))
 
-    import('@/api/mock/payment').then(({ mockReconciliationDifferences }) => {
+    import('../../../api/mock/payment').then(({ mockReconciliationDifferences }) => {
       differences.value = mockReconciliationDifferences.filter(item => item.reconciliationId === reconciliationId)
     })
   } catch (error) {

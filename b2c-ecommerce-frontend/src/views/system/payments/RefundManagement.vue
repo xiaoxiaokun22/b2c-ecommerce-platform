@@ -200,9 +200,9 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="upload-proof" v-if="row.status === 'success'">上传退款证明</el-dropdown>
-                  <el-dropdown-item command="cancel" v-if="row.status === 'pending'">取消退款</el-dropdown>
-                  <el-dropdown-item command="retry" v-if="row.status === 'failed'">重试退款</el-dropdown>
+                  <el-dropdown-item command="upload-proof" v-if="row.status === 'success'">上传退款证明</el-dropdown-item>
+                  <el-dropdown-item command="cancel" v-if="row.status === 'pending'">取消退款</el-dropdown-item>
+                  <el-dropdown-item command="retry" v-if="row.status === 'failed'">重试退款</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -213,13 +213,15 @@
       <!-- 分页 -->
       <div class="pagination-section">
         <el-pagination
-          v-model:current-page="pagination.page"
-          v-model:page-size="pagination.pageSize"
+          :current-page="pagination.page"
+          :page-size="pagination.pageSize"
           :total="pagination.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="handlePageSizeChange"
           @current-change="handlePageChange"
+          @update:current-page="pagination.page = $event"
+          @update:page-size="pagination.pageSize = $event"
         />
       </div>
     </div>
@@ -346,8 +348,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, ElUpload } from 'element-plus'
 import type { FormInstance, FormRules, UploadProps } from 'element-plus'
 import { Plus, Refresh, Search, Download, Clock, Loading, SuccessFilled, CircleCloseFilled, ArrowDown } from '@element-plus/icons-vue'
-import { refundApi } from '@/api/payment'
-import type { RefundRecord } from '@/types/payment'
+import { refundApi, type RefundRecord } from '../../../api/payment'
 
 // 响应式数据
 const loading = ref(false)
@@ -442,7 +443,7 @@ const loadData = async () => {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    import('@/api/mock/payment').then(({ mockRefundRecords }) => {
+    import('../../../api/mock/payment').then(({ mockRefundRecords }) => {
       let filteredData = mockRefundRecords
 
       // 应用搜索过滤

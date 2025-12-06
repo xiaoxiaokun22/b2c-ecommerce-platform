@@ -211,19 +211,19 @@
         </el-table-column>
         <el-table-column prop="failedCount" label="失败笔数" width="120">
           <template #default="{ row }">
-            <span class="failed-count">{{ row.failedCount.toLocaleString() }}</span>
+            <span class="failed-count">{{ (row.failedCount || 0).toLocaleString() }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="successRate" label="成功率" width="100">
           <template #default="{ row }">
             <span :class="getSuccessRateClass(row.successRate)">
-              {{ (row.successRate * 100).toFixed(1) }}%
+              {{ ((row.successRate || 0) * 100).toFixed(1) }}%
             </span>
           </template>
         </el-table-column>
         <el-table-column prop="averageAmount" label="平均金额" width="120">
           <template #default="{ row }">
-            ¥{{ row.averageAmount.toFixed(2) }}
+            ¥{{ (row.averageAmount || 0).toFixed(2) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120">
@@ -255,18 +255,18 @@
         <el-table-column prop="successRate" label="成功率" width="100">
           <template #default="{ row }">
             <span :class="getSuccessRateClass(row.successRate)">
-              {{ (row.successRate * 100).toFixed(1) }}%
+              {{ ((row.successRate || 0) * 100).toFixed(1) }}%
             </span>
           </template>
         </el-table-column>
         <el-table-column prop="averageAmount" label="平均金额" width="120">
           <template #default="{ row }">
-            ¥{{ row.averageAmount.toFixed(2) }}
+            ¥{{ (row.averageAmount || 0).toFixed(2) }}
           </template>
         </el-table-column>
         <el-table-column label="占比" width="100">
           <template #default="{ row }">
-            {{ (row.amount / overview.totalAmount * 100).toFixed(1) }}%
+            {{ ((row.amount || 0) / (overview.totalAmount || 1) * 100).toFixed(1) }}%
           </template>
         </el-table-column>
         <el-table-column label="趋势" width="200">
@@ -303,18 +303,18 @@
         <el-table-column prop="successRate" label="成功率" width="100">
           <template #default="{ row }">
             <span :class="getSuccessRateClass(row.successRate)">
-              {{ (row.successRate * 100).toFixed(1) }}%
+              {{ ((row.successRate || 0) * 100).toFixed(1) }}%
             </span>
           </template>
         </el-table-column>
         <el-table-column prop="averageAmount" label="平均金额" width="120">
           <template #default="{ row }">
-            ¥{{ row.averageAmount.toFixed(2) }}
+            ¥{{ (row.averageAmount || 0).toFixed(2) }}
           </template>
         </el-table-column>
         <el-table-column label="占比" width="100">
           <template #default="{ row }">
-            {{ (row.amount / overview.totalAmount * 100).toFixed(1) }}%
+            {{ ((row.amount || 0) / (overview.totalAmount || 1) * 100).toFixed(1) }}%
           </template>
         </el-table-column>
       </el-table>
@@ -327,7 +327,7 @@ import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Download, Refresh, Money, List, SuccessFilled, TrendCharts, CaretTop, CaretBottom, Minus } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
-import { paymentStatisticsApi } from '@/api/payment'
+import { paymentStatisticsApi } from '../../../api/payment'
 
 // 响应式数据
 const loading = ref(false)
@@ -379,7 +379,7 @@ const loadData = async () => {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 1000))
 
-    import('@/api/mock/payment').then(({ generateHistoricalStatistics, mockPaymentStatistics }) => {
+    import('../../../api/mock/payment').then(({ generateHistoricalStatistics, mockPaymentStatistics }) => {
       // 生成历史统计数据
       const days = filterForm.period === 'today' ? 1 :
                    filterForm.period === 'week' ? 7 :
@@ -598,7 +598,7 @@ const updateRiskChart = () => {
 const updateHourlyChart = () => {
   if (!hourlyChart) return
 
-  import('@/api/mock/payment').then(({ mockPaymentStatistics }) => {
+  import('../../../api/mock/payment').then(({ mockPaymentStatistics }) => {
     const hours = mockPaymentStatistics.hourlyStats.map(item => item.hour)
     const counts = mockPaymentStatistics.hourlyStats.map(item => item.count)
 

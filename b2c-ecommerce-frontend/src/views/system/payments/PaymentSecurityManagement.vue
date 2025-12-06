@@ -329,8 +329,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, Search, Warning, InfoFilled, CircleCloseFilled, UserFilled } from '@element-plus/icons-vue'
-import { paymentSecurityApi } from '@/api/payment'
-import type { PaymentSecurityRule } from '@/types/payment'
+import { paymentSecurityApi, type PaymentSecurityRule } from '../../../api/payment'
 
 // 响应式数据
 const loading = ref(false)
@@ -406,7 +405,7 @@ const loadRules = async () => {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    import('@/api/mock/payment').then(({ mockPaymentSecurityRules }) => {
+    import('../../../api/mock/payment').then(({ mockPaymentSecurityRules }) => {
       let filteredData = mockPaymentSecurityRules
 
       // 应用搜索过滤

@@ -135,13 +135,15 @@
       <!-- 分页 -->
       <div class="pagination-section">
         <el-pagination
-          v-model:current-page="pagination.page"
-          v-model:page-size="pagination.pageSize"
+          :current-page="pagination.page"
+          :page-size="pagination.pageSize"
           :total="pagination.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="handlePageSizeChange"
           @current-change="handlePageChange"
+          @update:current-page="pagination.page = $event"
+          @update:page-size="pagination.pageSize = $event"
         />
       </div>
     </div>
@@ -266,8 +268,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, Search, ArrowDown } from '@element-plus/icons-vue'
-import { paymentChannelApi } from '@/api/payment'
-import type { PaymentChannel } from '@/types/payment'
+import { paymentChannelApi, type PaymentChannel } from '../../../api/payment'
 
 // 响应式数据
 const loading = ref(false)
@@ -375,7 +376,7 @@ const loadData = async () => {
 
     // 这里应该调用 paymentChannelApi.getList()
     // 为了演示，我们使用模拟数据
-    import('@/api/mock/payment').then(({ mockPaymentChannels }) => {
+    import('../../../api/mock/payment').then(({ mockPaymentChannels }) => {
       let filteredData = mockPaymentChannels
 
       // 应用搜索过滤
