@@ -71,15 +71,130 @@
 
         <div class="login-footer">
           <span>还没有账号？</span>
-          <el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
+          <el-link type="primary" @click="router.push('/register')">立即注册</el-link>
         </div>
       </el-form>
+
+      <!-- 忘记密码对话框 -->
+      <el-dialog
+        v-model="forgetPasswordVisible"
+        title="忘记密码"
+        width="420px"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        @close="resetForgetPasswordForm"
+      >
+        <el-form
+          ref="forgetPasswordFormRef"
+          :model="forgetPasswordForm"
+          :rules="forgetPasswordRules"
+          label-width="80px"
+          @submit.enter.prevent
+        >
+          <el-form-item label="账号" prop="account">
+            <el-input
+              v-model="forgetPasswordForm.account"
+              placeholder="请输入用户名/手机号/邮箱"
+              prefix-icon="User"
+              clearable
+            />
+          </el-form-item>
+
+          <el-form-item label="验证方式" prop="verifyType">
+            <el-radio-group v-model="forgetPasswordForm.verifyType">
+              <el-radio value="email">邮箱验证</el-radio>
+              <el-radio value="phone">短信验证</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item
+            v-if="forgetPasswordForm.verifyType === 'email'"
+            label="邮箱"
+            prop="email"
+          >
+            <el-input
+              v-model="forgetPasswordForm.email"
+              placeholder="请输入邮箱地址"
+              prefix-icon="Message"
+              clearable
+            />
+          </el-form-item>
+
+          <el-form-item
+            v-if="forgetPasswordForm.verifyType === 'phone'"
+            label="手机号"
+            prop="phone"
+          >
+            <el-input
+              v-model="forgetPasswordForm.phone"
+              placeholder="请输入手机号"
+              prefix-icon="Phone"
+              clearable
+            />
+          </el-form-item>
+
+          <el-form-item label="验证码" prop="verifyCode">
+            <div class="verify-code-container">
+              <el-input
+                v-model="forgetPasswordForm.verifyCode"
+                placeholder="请输入验证码"
+                prefix-icon="Key"
+                maxlength="6"
+                clearable
+              />
+              <el-button
+                type="primary"
+                :disabled="!canSendCode || codeCountdown > 0"
+                :loading="sendingCode"
+                @click="sendVerifyCode"
+              >
+                {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+              </el-button>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="新密码" prop="newPassword">
+            <el-input
+              v-model="forgetPasswordForm.newPassword"
+              type="password"
+              placeholder="请输入新密码（8-20位，包含字母和数字）"
+              prefix-icon="Lock"
+              show-password
+              clearable
+            />
+          </el-form-item>
+
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input
+              v-model="forgetPasswordForm.confirmPassword"
+              type="password"
+              placeholder="请再次输入新密码"
+              prefix-icon="Lock"
+              show-password
+              clearable
+            />
+          </el-form-item>
+        </el-form>
+
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="forgetPasswordVisible = false">取消</el-button>
+            <el-button
+              type="primary"
+              :loading="resettingPassword"
+              @click="handleResetPassword"
+            >
+              重置密码
+            </el-button>
+          </div>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { useUserStore } from '@/stores/user'
@@ -90,12 +205,24 @@ const userStore = useUserStore()
 
 // 表单引用
 const loginFormRef = ref<FormInstance>()
+const forgetPasswordFormRef = ref<FormInstance>()
 
 // 表单数据
 const loginForm = reactive<LoginForm>({
   username: '',
   password: '',
   code: ''
+})
+
+// 忘记密码表单数据
+const forgetPasswordForm = reactive({
+  account: '',
+  verifyType: 'email',
+  email: '',
+  phone: '',
+  verifyCode: '',
+  newPassword: '',
+  confirmPassword: ''
 })
 
 // 表单验证规则
@@ -125,12 +252,88 @@ const loginRules = {
   ]
 }
 
+// 忘记密码表单验证规则
+const forgetPasswordRules = {
+  account: [
+    { required: true, message: '请输入用户名/手机号/邮箱', trigger: 'blur' }
+  ],
+  verifyType: [
+    { required: true, message: '请选择验证方式', trigger: 'change' }
+  ],
+  email: [
+    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+    {
+      validator: (rule: any, value: string, callback: Function) => {
+        const emailReg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        if (!emailReg.test(value)) {
+          callback(new Error('请输入有效的邮箱地址'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ],
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    {
+      validator: (rule: any, value: string, callback: Function) => {
+        const phoneReg = /^1[3-9]\d{9}$/
+        if (!phoneReg.test(value)) {
+          callback(new Error('请输入有效的手机号'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ],
+  verifyCode: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { len: 6, message: '验证码长度为6位', trigger: 'blur' }
+  ],
+  newPassword: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 8, max: 20, message: '密码长度为8-20位', trigger: 'blur' },
+    {
+      validator: (rule: any, value: string, callback: Function) => {
+        const hasLetter = /[a-zA-Z]/.test(value)
+        const hasNumber = /\d/.test(value)
+        if (!hasLetter || !hasNumber) {
+          callback(new Error('密码必须包含字母和数字'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ],
+  confirmPassword: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    {
+      validator: (rule: any, value: string, callback: Function) => {
+        if (value !== forgetPasswordForm.newPassword) {
+          callback(new Error('两次输入的密码不一致'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ]
+}
+
 // 状态变量
 const loginLoading = ref(false)
 const codeSending = ref(false)
 const codeCountdown = ref(0)
 const needCode = ref(false)
 const rememberMe = ref(false)
+
+// 忘记密码相关状态
+const forgetPasswordVisible = ref(false)
+const sendingCode = ref(false)
+const resettingPassword = ref(false)
 
 // 登录处理
 const handleLogin = async () => {
@@ -191,7 +394,88 @@ const sendCode = async () => {
 
 // 忘记密码
 const handleForgetPassword = () => {
-  ElMessage.info('请联系客服重置密码')
+  forgetPasswordVisible.value = true
+}
+
+// 计算属性：是否可以发送验证码
+const canSendCode = computed(() => {
+  if (forgetPasswordForm.verifyType === 'email') {
+    return forgetPasswordForm.email && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(forgetPasswordForm.email)
+  } else {
+    return forgetPasswordForm.phone && /^1[3-9]\d{9}$/.test(forgetPasswordForm.phone)
+  }
+})
+
+// 发送验证码
+const sendVerifyCode = async () => {
+  if (!forgetPasswordFormRef.value) return
+
+  try {
+    // 验证表单字段
+    const fieldsToValidate = forgetPasswordForm.verifyType === 'email' ? ['account', 'email'] : ['account', 'phone']
+    await forgetPasswordFormRef.value.validateField(fieldsToValidate)
+
+    sendingCode.value = true
+
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    ElMessage.success('验证码已发送，请注意查收')
+
+    // 开始倒计时
+    codeCountdown.value = 60
+    const timer = setInterval(() => {
+      codeCountdown.value--
+      if (codeCountdown.value <= 0) {
+        clearInterval(timer)
+      }
+    }, 1000)
+
+  } catch (error) {
+    console.error('发送验证码失败:', error)
+  } finally {
+    sendingCode.value = false
+  }
+}
+
+// 重置密码
+const handleResetPassword = async () => {
+  if (!forgetPasswordFormRef.value) return
+
+  try {
+    await forgetPasswordFormRef.value.validate()
+
+    resettingPassword.value = true
+
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    ElMessage.success('密码重置成功，请使用新密码登录')
+    forgetPasswordVisible.value = false
+    resetForgetPasswordForm()
+
+  } catch (error) {
+    console.error('重置密码失败:', error)
+  } finally {
+    resettingPassword.value = false
+  }
+}
+
+// 重置忘记密码表单
+const resetForgetPasswordForm = () => {
+  if (forgetPasswordFormRef.value) {
+    forgetPasswordFormRef.value.resetFields()
+  }
+  Object.assign(forgetPasswordForm, {
+    account: '',
+    verifyType: 'email',
+    email: '',
+    phone: '',
+    verifyCode: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  codeCountdown.value = 0
 }
 
 // 初始化记住的用户名
@@ -299,5 +583,26 @@ initRememberUsername()
   .code-input .el-button {
     width: 100%;
   }
+}
+
+/* 忘记密码对话框样式 */
+.verify-code-container {
+  display: flex;
+  gap: 10px;
+}
+
+.verify-code-container .el-input {
+  flex: 1;
+}
+
+.verify-code-container .el-button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>
