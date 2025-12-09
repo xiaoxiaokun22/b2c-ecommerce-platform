@@ -238,6 +238,61 @@ const router = createRouter({
           name: 'system.marketing-analysis',
           component: () => import('@/views/system/marketing/MarketingAnalysis.vue'),
           meta: { requiresAuth: true, title: '营销数据分析' }
+        },
+        // 消息通知模块
+        {
+          path: 'message-templates',
+          name: 'system.message-templates',
+          component: () => import('@/views/system/message/MessageTemplateList.vue'),
+          meta: { requiresAuth: true, title: '消息模板' }
+        },
+        {
+          path: 'message-templates/create',
+          name: 'system.message-templates.create',
+          component: () => import('@/views/system/message/MessageTemplateForm.vue'),
+          meta: { requiresAuth: true, title: '创建消息模板' }
+        },
+        {
+          path: 'message-templates/edit/:id',
+          name: 'system.message-templates.edit',
+          component: () => import('@/views/system/message/MessageTemplateForm.vue'),
+          meta: { requiresAuth: true, title: '编辑消息模板' }
+        },
+        {
+          path: 'message-send',
+          name: 'system.message-send',
+          component: () => import('@/views/system/message/MessageSend.vue'),
+          meta: { requiresAuth: true, title: '发送消息' }
+        },
+        {
+          path: 'message-records',
+          name: 'system.message-records',
+          component: () => import('@/views/system/message/MessageRecords.vue'),
+          meta: { requiresAuth: true, title: '发送记录' }
+        },
+        {
+          path: 'notification-rules',
+          name: 'system.notification-rules',
+          component: () => import('@/views/system/message/NotificationRules.vue'),
+          meta: { requiresAuth: true, title: '通知规则' }
+        },
+        {
+          path: 'notification-rules/create',
+          name: 'system.notification-rules.create',
+          component: () => import('@/views/system/message/NotificationRuleForm.vue'),
+          meta: { requiresAuth: true, title: '创建通知规则' }
+        },
+        {
+          path: 'notification-rules/edit/:id',
+          name: 'system.notification-rules.edit',
+          component: () => import('@/views/system/message/NotificationRuleForm.vue'),
+          meta: { requiresAuth: true, title: '编辑通知规则' }
+        },
+        {
+          path: 'message-statistics',
+          name: 'system.message-statistics',
+          component: () => import('@/views/system/message/MessageStatistics.vue'),
+          meta: { requiresAuth: true, title: '消息统计' }
         }
       ]
     }

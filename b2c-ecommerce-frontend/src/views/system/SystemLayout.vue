@@ -148,6 +148,34 @@
               <span>营销分析</span>
             </el-menu-item>
           </el-sub-menu>
+
+          <!-- 消息通知 -->
+          <el-sub-menu index="message">
+            <template #title>
+              <el-icon><Bell /></el-icon>
+              <span>消息通知</span>
+            </template>
+            <el-menu-item index="/system/message-templates">
+              <el-icon><Document /></el-icon>
+              <span>消息模板</span>
+            </el-menu-item>
+            <el-menu-item index="/system/message-send">
+              <el-icon><Message /></el-icon>
+              <span>发送消息</span>
+            </el-menu-item>
+            <el-menu-item index="/system/message-records">
+              <el-icon><List /></el-icon>
+              <span>发送记录</span>
+            </el-menu-item>
+            <el-menu-item index="/system/notification-rules">
+              <el-icon><Setting /></el-icon>
+              <span>通知规则</span>
+            </el-menu-item>
+            <el-menu-item index="/system/message-statistics">
+              <el-icon><DataAnalysis /></el-icon>
+              <span>消息统计</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
 
@@ -198,7 +226,7 @@ import {
   User, UserFilled, Lock, ArrowDown, Goods, List, Files, ChatDotRound,
   ShoppingCart, Money, Service, TrendCharts, CreditCard, Wallet, Key,
   RefreshLeft, ScaleToOriginal, DataAnalysis, Box, Warning, EditPen,
-  Present, Promotion, Ticket, Timer
+  Present, Promotion, Ticket, Timer, Bell, Document, Setting, Message
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
