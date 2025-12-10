@@ -203,7 +203,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
@@ -257,7 +257,9 @@ const rules = {
 }
 
 // 是否是编辑模式
-const isEdit = computed(() => route.query.edit || route.params.id)
+const isEdit = computed(() => {
+  return route.path.includes('/edit') || route.query.edit || route.params.id
+})
 
 // 商品选项
 const productOptions = [
@@ -317,6 +319,60 @@ const handleReset = () => {
   }
 }
 
+// 加载促销活动数据
+const loadPromotion = async (id: string | string[]) => {
+  loading.value = true
+  try {
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // 模拟返回的数据
+    const mockData = {
+      id: id,
+      name: '双十一限时优惠',
+      type: 'full_reduction',
+      description: '双十一期间，全场商品满1000减200，限时优惠！',
+      timeRange: [
+        new Date('2024-11-01 00:00:00'),
+        new Date('2024-11-11 23:59:59')
+      ],
+      rules: [
+        { minAmount: 1000, discountAmount: 200 },
+        { minAmount: 2000, discountAmount: 500 }
+      ],
+      discountRate: 0.8,
+      maxDiscountAmount: 1000,
+      productIds: ['PRD001', 'PRD002'],
+      applicableType: 'all',
+      applicableCategories: [],
+      applicableProducts: [],
+      maxUsagePerUser: 5
+    }
+
+    // 填充表单数据
+    Object.assign(form, {
+      name: mockData.name,
+      type: mockData.type,
+      description: mockData.description,
+      timeRange: mockData.timeRange,
+      rules: mockData.rules,
+      discountRate: mockData.discountRate,
+      maxDiscountAmount: mockData.maxDiscountAmount,
+      productIds: mockData.productIds,
+      applicableType: mockData.applicableType,
+      applicableCategories: mockData.applicableCategories,
+      applicableProducts: mockData.applicableProducts,
+      maxUsagePerUser: mockData.maxUsagePerUser
+    })
+
+  } catch (error) {
+    ElMessage.error('加载活动数据失败')
+    console.error('加载活动数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
 // 返回列表
 const handleBack = () => {
   router.back()
@@ -326,8 +382,10 @@ const handleBack = () => {
 onMounted(() => {
   // 如果是编辑模式，加载活动数据
   if (isEdit.value) {
-    // TODO: 加载活动数据
-    console.log('Edit mode:', route.query.edit || route.params.id)
+    const id = route.query.edit || route.params.id
+    if (id) {
+      loadPromotion(id)
+    }
   }
 })
 </script>

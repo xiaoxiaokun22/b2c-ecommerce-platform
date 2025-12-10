@@ -246,6 +246,110 @@
         />
       </div>
     </el-card>
+
+    <!-- 优惠券详情对话框 -->
+    <el-dialog
+      v-model="detailVisible"
+      title="优惠券详情"
+      width="800px"
+      :before-close="handleCloseDetail"
+    >
+      <div v-if="selectedCoupon" class="coupon-detail">
+        <!-- 基本信息 -->
+        <el-descriptions title="基本信息" :column="2" border>
+          <el-descriptions-item label="优惠券名称">
+            {{ selectedCoupon.name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="优惠券类型">
+            <el-tag :type="getCouponTypeTag(selectedCoupon.type)">
+              {{ getCouponTypeText(selectedCoupon.type) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="面额">
+            {{ formatCouponValue(selectedCoupon) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="使用门槛">
+            {{ formatCondition(selectedCoupon) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="发行数量">
+            {{ selectedCoupon.totalQuantity }}
+          </el-descriptions-item>
+          <el-descriptions-item label="每人限领">
+            {{ selectedCoupon.limitPerUser }} 张
+          </el-descriptions-item>
+          <el-descriptions-item label="领取时间" :span="2">
+            {{ selectedCoupon.receiveStartTime }} 至 {{ selectedCoupon.receiveEndTime }}
+          </el-descriptions-item>
+          <el-descriptions-item label="有效期">
+            领取后 {{ selectedCoupon.validDays }} 天
+          </el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="getStatusType(selectedCoupon.status)">
+              {{ getStatusText(selectedCoupon.status) }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 使用情况 -->
+        <el-descriptions title="使用情况" :column="3" border class="mt-20">
+          <el-descriptions-item label="已领取">
+            <el-tag type="primary">{{ selectedCoupon.receivedQuantity }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="已使用">
+            <el-tag type="success">{{ selectedCoupon.usedQuantity }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="使用率">
+            {{ getUsageRate(selectedCoupon) }}%
+          </el-descriptions-item>
+          <el-descriptions-item label="领取进度" :span="3">
+            <el-progress
+              :percentage="getReceivePercentage(selectedCoupon)"
+              :color="getProgressColor(getReceivePercentage(selectedCoupon))"
+              :stroke-width="8"
+            />
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 适用范围 -->
+        <el-descriptions title="适用范围" :column="1" border class="mt-20">
+          <el-descriptions-item label="领取条件">
+            <el-tag size="small">
+              {{ getReceiveConditionText(selectedCoupon.receiveCondition) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="适用商品">
+            <span v-if="selectedCoupon.applicableProducts?.length">
+              {{ selectedCoupon.applicableProducts.join('、') }}
+            </span>
+            <span v-else class="text-gray">全部商品可用</span>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 使用说明 -->
+        <div class="mt-20" v-if="selectedCoupon.description">
+          <h4>使用说明</h4>
+          <div class="description-box">
+            {{ selectedCoupon.description }}
+          </div>
+        </div>
+
+        <!-- 创建信息 -->
+        <el-descriptions title="创建信息" :column="2" border class="mt-20">
+          <el-descriptions-item label="创建人">
+            系统管理员
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间">
+            {{ selectedCoupon.createTime }}
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="detailVisible = false">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -428,9 +532,14 @@ const handleEdit = (row: any) => {
   router.push(`/system/coupons/create?edit=${row.id}`)
 }
 
+// 详情对话框相关
+const detailVisible = ref(false)
+const selectedCoupon = ref<any>(null)
+
 // 查看详情
 const handleView = (row: any) => {
-  ElMessage.info(`查看优惠券详情: ${row.name}`)
+  selectedCoupon.value = row
+  detailVisible.value = true
 }
 
 // 处理下拉菜单命令
@@ -454,6 +563,32 @@ const handleCommand = async (command: string, row: any) => {
 // 查看统计
 const handleViewStatistics = (row: any) => {
   ElMessage.info(`查看优惠券统计: ${row.name}`)
+}
+
+// 获取优惠券类型标签样式
+const getCouponTypeTag = (type: string) => {
+  const tagMap: Record<string, string> = {
+    full_reduction: 'success',
+    discount: 'warning',
+    cash: 'danger'
+  }
+  return tagMap[type] || 'info'
+}
+
+// 获取优惠券类型文本
+const getCouponTypeText = (type: string) => {
+  const textMap: Record<string, string> = {
+    full_reduction: '满减券',
+    discount: '折扣券',
+    cash: '现金券'
+  }
+  return textMap[type] || type
+}
+
+// 关闭详情对话框
+const handleCloseDetail = () => {
+  detailVisible.value = false
+  selectedCoupon.value = null
 }
 
 // 启用优惠券
@@ -638,5 +773,56 @@ onMounted(() => {
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid #ebeef5;
+}
+
+/* 详情对话框样式 */
+.coupon-detail {
+  padding: 0;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.description-box {
+  padding: 12px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  line-height: 1.6;
+  color: #606266;
+}
+
+.text-gray {
+  color: #909399;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 描述列表间距 */
+:deep(.el-descriptions) {
+  margin-bottom: 16px;
+}
+
+:deep(.el-descriptions__title) {
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 16px;
+}
+
+:deep(.el-descriptions__body) {
+  background-color: #fafafa;
+}
+
+:deep(.el-descriptions-item__label) {
+  font-weight: 500;
+  color: #606266;
+  background-color: #f5f7fa;
+}
+
+:deep(.el-descriptions-item__content) {
+  color: #303133;
 }
 </style>

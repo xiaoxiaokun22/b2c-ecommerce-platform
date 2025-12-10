@@ -321,6 +321,109 @@
         <el-button type="primary" @click="handleRuleSubmit" :loading="submitting">确定</el-button>
       </template>
     </el-dialog>
+
+    <!-- 风险事件详情对话框 -->
+    <el-dialog
+      v-model="eventDetailVisible"
+      title="风险事件详情"
+      width="900px"
+      destroy-on-close
+    >
+      <div v-if="selectedEvent" class="event-detail">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="订单号">
+            {{ selectedEvent.orderId }}
+          </el-descriptions-item>
+          <el-descriptions-item label="风险等级">
+            <el-tag :type="getRiskLevelColor(selectedEvent.riskLevel)">
+              {{ getRiskLevelName(selectedEvent.riskLevel) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="风险评分">
+            <span :class="getRiskScoreClass(selectedEvent.riskScore)">{{ selectedEvent.riskScore }}</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="处理动作">
+            <el-tag :type="getActionTypeColor(selectedEvent.action)">
+              {{ getActionTypeName(selectedEvent.action) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="支付金额">
+            ¥{{ selectedEvent.amount.toFixed(2) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="发生时间">
+            {{ formatDateTime(selectedEvent.createdAt) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="风险原因" :span="2">
+            {{ selectedEvent.riskReason }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <h4 class="detail-section-title">客户端信息</h4>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="IP地址">
+            {{ selectedEvent.clientInfo.ip }}
+          </el-descriptions-item>
+          <el-descriptions-item label="设备ID">
+            {{ selectedEvent.clientInfo.deviceId || '未记录' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="用户代理" :span="2">
+            <div class="user-agent">{{ selectedEvent.clientInfo.userAgent }}</div>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <h4 class="detail-section-title">用户信息</h4>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="用户ID">
+            {{ selectedEvent.userInfo?.userId || '未登录' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="用户名">
+            {{ selectedEvent.userInfo?.username || '-' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="注册时间">
+            {{ selectedEvent.userInfo?.registeredAt ? formatDateTime(selectedEvent.userInfo.registeredAt) : '未注册' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="用户等级">
+            {{ selectedEvent.userInfo?.level || '-' }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <h4 class="detail-section-title">风险因素</h4>
+        <el-table :data="selectedEvent.riskFactors" border size="small">
+          <el-table-column prop="factor" label="风险因素" width="200" />
+          <el-table-column prop="value" label="检测值" width="150" />
+          <el-table-column prop="threshold" label="阈值" width="150" />
+          <el-table-column prop="score" label="扣分" width="100">
+            <template #default="{ row }">
+              <span class="risk-score-deduction">-{{ row.score }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="description" label="说明" />
+        </el-table>
+
+        <h4 class="detail-section-title">处理记录</h4>
+        <el-timeline>
+          <el-timeline-item
+            v-for="(record, index) in selectedEvent.processRecords"
+            :key="index"
+            :timestamp="formatDateTime(record.timestamp)"
+            :type="getTimelineType(record.action)"
+          >
+            <div class="timeline-content">
+              <div class="timeline-action">{{ getActionTypeName(record.action) }}</div>
+              <div class="timeline-operator">操作人: {{ record.operator }}</div>
+              <div v-if="record.note" class="timeline-note">{{ record.note }}</div>
+            </div>
+          </el-timeline-item>
+        </el-timeline>
+      </div>
+
+      <template #footer>
+        <el-button @click="eventDetailVisible = false">关闭</el-button>
+        <el-button v-if="selectedEvent?.action === 'manual_review'" type="primary" @click="handleProcessEvent">
+          处理
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -340,6 +443,8 @@ const ruleDialogTitle = ref('')
 const isEdit = ref(false)
 const rulesList = ref<PaymentSecurityRule[]>([])
 const riskEvents = ref<any[]>([])
+const eventDetailVisible = ref(false)
+const selectedEvent = ref<any>(null)
 
 // 风险统计数据
 const riskStats = reactive({
@@ -443,8 +548,46 @@ const loadRiskEvents = async () => {
       action: ['block', 'manual_review', 'alert', 'log'][Math.floor(Math.random() * 4)],
       clientInfo: {
         ip: `192.168.1.${Math.floor(Math.random() * 255)}`,
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        deviceId: Math.random() > 0.5 ? `device_${Math.floor(Math.random() * 10000)}` : null
       },
+      userInfo: Math.random() > 0.2 ? {
+        userId: `user_${Math.floor(Math.random() * 1000)}`,
+        username: `user${Math.floor(Math.random() * 1000)}`,
+        level: ['普通会员', '银卡会员', '金卡会员'][Math.floor(Math.random() * 3)],
+        registeredAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
+      } : null,
+      riskFactors: [
+        {
+          factor: 'IP风险评估',
+          value: '高风险',
+          threshold: '中风险',
+          score: 30,
+          description: 'IP地址位于高风险地区'
+        },
+        {
+          factor: '支付金额',
+          value: '￥' + (Math.floor(Math.random() * 10000) + 100),
+          threshold: '￥5000',
+          score: 20,
+          description: '支付金额超过阈值'
+        },
+        {
+          factor: '支付频率',
+          value: '5次/小时',
+          threshold: '3次/小时',
+          score: 15,
+          description: '短时间内支付频繁'
+        }
+      ],
+      processRecords: [
+        {
+          action: 'alert',
+          operator: '系统',
+          timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+          note: '系统自动检测到风险'
+        }
+      ],
       createdAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
     }))
   } catch (error) {
@@ -573,7 +716,34 @@ const handleDelete = async (row: PaymentSecurityRule) => {
 }
 
 const handleViewEvent = (row: any) => {
-  ElMessage.info(`查看风险事件详情: ${row.orderId}`)
+  selectedEvent.value = row
+  eventDetailVisible.value = true
+}
+
+const handleProcessEvent = () => {
+  ElMessageBox.prompt('请输入处理说明', '处理风险事件', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputPattern: /.+/,
+    inputErrorMessage: '请输入处理说明'
+  }).then(({ value }) => {
+    // 添加处理记录
+    if (selectedEvent.value) {
+      selectedEvent.value.processRecords.push({
+        action: 'manual_review',
+        operator: '当前管理员',
+        timestamp: new Date().toISOString(),
+        note: value
+      })
+      selectedEvent.value.action = 'processed'
+    }
+
+    ElMessage.success('处理成功')
+    eventDetailVisible.value = false
+    loadRiskEvents()
+  }).catch(() => {
+    ElMessage.info('已取消处理')
+  })
 }
 
 const addCondition = () => {
@@ -709,6 +879,17 @@ const formatCondition = (condition: any) => {
 
 const formatDateTime = (dateTime: string) => {
   return new Date(dateTime).toLocaleString('zh-CN')
+}
+
+const getTimelineType = (action: string) => {
+  const typeMap: Record<string, string> = {
+    block: 'danger',
+    manual_review: 'warning',
+    alert: 'info',
+    log: '',
+    processed: 'success'
+  }
+  return typeMap[action] || 'primary'
 }
 
 // 生命周期
@@ -877,5 +1058,57 @@ onMounted(() => {
 
 :deep(.el-form-item) {
   margin-bottom: 18px;
+}
+
+.event-detail {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.detail-section-title {
+  margin: 24px 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  border-bottom: 1px solid #ebeef5;
+  padding-bottom: 8px;
+}
+
+.user-agent {
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 12px;
+  background-color: #f5f7fa;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.risk-score-deduction {
+  color: #f56c6c;
+  font-weight: bold;
+}
+
+.timeline-content {
+  padding-left: 8px;
+}
+
+.timeline-action {
+  font-weight: 600;
+  color: #303133;
+}
+
+.timeline-operator {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+}
+
+.timeline-note {
+  font-size: 14px;
+  color: #606266;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f0f9ff;
+  border-radius: 4px;
 }
 </style>

@@ -210,9 +210,6 @@
                   >
                     删除活动
                   </el-dropdown-item>
-                  <el-dropdown-item command="copy">
-                    复制活动
-                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -233,6 +230,106 @@
         />
       </div>
     </el-card>
+
+    <!-- 活动详情对话框 -->
+    <el-dialog
+      v-model="detailVisible"
+      title="促销活动详情"
+      width="800px"
+      destroy-on-close
+    >
+      <div v-if="selectedPromotion" class="promotion-detail">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="活动名称">
+            {{ selectedPromotion.name }}
+          </el-descriptions-item>
+          <el-descriptions-item label="活动类型">
+            <el-tag :type="getTypeColor(selectedPromotion.type)">
+              {{ getTypeName(selectedPromotion.type) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="活动状态">
+            <el-tag :type="getStatusColor(selectedPromotion.status)">
+              {{ getStatusName(selectedPromotion.status) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="活动时间" :span="2">
+            {{ formatDateTime(selectedPromotion.startTime) }} 至 {{ formatDateTime(selectedPromotion.endTime) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="活动描述" :span="2">
+            {{ selectedPromotion.description }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <h4 class="detail-section-title">优惠规则</h4>
+        <el-table :data="selectedPromotion.rules" border size="small">
+          <el-table-column prop="minAmount" label="最低消费金额" width="150">
+            <template #default="{ row }">
+              ¥{{ row.minAmount }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="discountAmount" label="优惠金额" width="150">
+            <template #default="{ row }">
+              <span class="discount-amount">-¥{{ row.discountAmount }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="maxDiscountAmount" label="最大优惠" width="150">
+            <template #default="{ row }">
+              {{ row.maxDiscountAmount ? `¥${row.maxDiscountAmount}` : '无限制' }}
+            </template>
+          </el-table-column>
+          <el-table-column label="优惠率" width="150">
+            <template #default="{ row }">
+              {{ row.discountRate ? `${(row.discountRate * 10).toFixed(1)}折` : '-' }}
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <h4 class="detail-section-title">使用情况</h4>
+        <el-descriptions :column="3" border>
+          <el-descriptions-item label="参与人数">
+            {{ selectedPromotion.participantCount || 0 }} 人
+          </el-descriptions-item>
+          <el-descriptions-item label="使用次数">
+            {{ selectedPromotion.usageCount || 0 }} 次
+          </el-descriptions-item>
+          <el-descriptions-item label="优惠总额">
+            ¥{{ (selectedPromotion.totalDiscount || 0).toFixed(2) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="每人限用">
+            {{ selectedPromotion.maxUsagePerUser }} 次
+          </el-descriptions-item>
+          <el-descriptions-item label="适用范围">
+            {{ getApplicableTypeName(selectedPromotion.applicableType) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间">
+            {{ formatDateTime(selectedPromotion.createdAt) }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <h4 v-if="selectedPromotion.applicableProducts && selectedPromotion.applicableProducts.length > 0"
+             class="detail-section-title">
+          适用商品
+        </h4>
+        <el-table v-if="selectedPromotion.applicableProducts && selectedPromotion.applicableProducts.length > 0"
+                  :data="selectedPromotion.applicableProducts"
+                  border
+                  size="small"
+                  max-height="200">
+          <el-table-column prop="name" label="商品名称" />
+          <el-table-column prop="price" label="价格" width="120">
+            <template #default="{ row }">
+              ¥{{ row.price }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="category" label="分类" width="120" />
+        </el-table>
+      </div>
+
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -251,6 +348,8 @@ const router = useRouter()
 // 响应式数据
 const loading = ref(false)
 const tableData = ref<any[]>([])
+const detailVisible = ref(false)
+const selectedPromotion = ref<any>(null)
 
 // 搜索表单
 const searchForm = reactive({
@@ -397,7 +496,8 @@ const handleEdit = (row: any) => {
 
 // 查看详情
 const handleView = (row: any) => {
-  ElMessage.info(`查看活动详情: ${row.name}`)
+  selectedPromotion.value = row
+  detailVisible.value = true
 }
 
 // 处理下拉菜单命令
@@ -411,9 +511,6 @@ const handleCommand = async (command: string, row: any) => {
       break
     case 'delete':
       await handleDeleteActivity(row)
-      break
-    case 'copy':
-      handleCopyActivity(row)
       break
   }
 }
@@ -481,10 +578,56 @@ const handleDeleteActivity = async (row: any) => {
   }
 }
 
-// 复制活动
-const handleCopyActivity = (row: any) => {
-  ElMessage.success(`复制活动: ${row.name}`)
-  router.push(`/system/promotions/create?copy=${row.id}`)
+// 辅助函数
+const getTypeName = (type: string) => {
+  const typeMap: Record<string, string> = {
+    full_reduction: '满减优惠',
+    discount: '折扣优惠',
+    limited_offer: '限时特价'
+  }
+  return typeMap[type] || type
+}
+
+const getTypeColor = (type: string) => {
+  const colorMap: Record<string, string> = {
+    full_reduction: 'primary',
+    discount: 'success',
+    limited_offer: 'warning'
+  }
+  return colorMap[type] || ''
+}
+
+const getStatusName = (status: string) => {
+  const statusMap: Record<string, string> = {
+    active: '进行中',
+    paused: '已暂停',
+    ended: '已结束',
+    pending: '未开始'
+  }
+  return statusMap[status] || status
+}
+
+const getStatusColor = (status: string) => {
+  const colorMap: Record<string, string> = {
+    active: 'success',
+    paused: 'warning',
+    ended: 'info',
+    pending: ''
+  }
+  return colorMap[status] || ''
+}
+
+const getApplicableTypeName = (type: string) => {
+  const typeMap: Record<string, string> = {
+    all: '全部商品',
+    category: '指定分类',
+    product: '指定商品'
+  }
+  return typeMap[type] || type
+}
+
+const formatDateTime = (dateTime: string | Date) => {
+  return new Date(dateTime).toLocaleString('zh-CN')
 }
 
 // 分页事件
@@ -577,5 +720,24 @@ onMounted(() => {
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid #ebeef5;
+}
+
+.promotion-detail {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.detail-section-title {
+  margin: 24px 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  border-bottom: 1px solid #ebeef5;
+  padding-bottom: 8px;
+}
+
+.discount-amount {
+  color: #f56c6c;
+  font-weight: bold;
 }
 </style>
