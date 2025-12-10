@@ -148,17 +148,29 @@
           <el-input
             v-model="userForm.username"
             placeholder="请输入用户名"
-            :disabled="dialogMode === 'edit'"
+            :disabled="dialogMode === 'edit' || dialogMode === 'view'"
           />
         </el-form-item>
         <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="userForm.nickname" placeholder="请输入昵称" />
+          <el-input
+            v-model="userForm.nickname"
+            placeholder="请输入昵称"
+            :disabled="dialogMode === 'view'"
+          />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userForm.email" placeholder="请输入邮箱" />
+          <el-input
+            v-model="userForm.email"
+            placeholder="请输入邮箱"
+            :disabled="dialogMode === 'view'"
+          />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="userForm.phone" placeholder="请输入手机号" />
+          <el-input
+            v-model="userForm.phone"
+            placeholder="请输入手机号"
+            :disabled="dialogMode === 'view'"
+          />
         </el-form-item>
         <el-form-item v-if="dialogMode === 'add'" label="密码" prop="password">
           <el-input
@@ -169,7 +181,11 @@
           />
         </el-form-item>
         <el-form-item label="性别" prop="gender">
-          <el-select v-model="userForm.gender" placeholder="请选择性别">
+          <el-select
+            v-model="userForm.gender"
+            placeholder="请选择性别"
+            :disabled="dialogMode === 'view'"
+          >
             <el-option label="未知" :value="0" />
             <el-option label="男" :value="1" />
             <el-option label="女" :value="2" />
@@ -182,19 +198,40 @@
             placeholder="请选择生日"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
+            :disabled="dialogMode === 'view'"
           />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="userForm.status">
+          <el-radio-group v-model="userForm.status" :disabled="dialogMode === 'view'">
             <el-radio :label="1">正常</el-radio>
             <el-radio :label="2">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="角色">
+          <div v-if="userForm.roles && userForm.roles.length > 0">
+            <el-tag
+              v-for="role in userForm.roles"
+              :key="role.id"
+              size="small"
+              class="mr-1"
+            >
+              {{ role.name }}
+            </el-tag>
+          </div>
+          <span v-else class="text-gray-400">暂无角色</span>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit" :loading="submitLoading">
+          <el-button @click="dialogVisible = false">
+            {{ dialogMode === 'view' ? '关闭' : '取消' }}
+          </el-button>
+          <el-button
+            v-if="dialogMode !== 'view'"
+            type="primary"
+            @click="handleSubmit"
+            :loading="submitLoading"
+          >
             确认
           </el-button>
         </span>
@@ -276,7 +313,8 @@ const userForm = reactive({
   password: '',
   gender: 0,
   birthday: '',
-  status: 1
+  status: 1,
+  roles: [] as Role[]
 })
 
 // 表单验证规则
@@ -530,7 +568,8 @@ const resetUserForm = () => {
     password: '',
     gender: 0,
     birthday: '',
-    status: 1
+    status: 1,
+    roles: []
   })
 }
 
