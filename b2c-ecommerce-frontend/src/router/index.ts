@@ -74,6 +74,12 @@ const router = createRouter({
           meta: { requiresAuth: true, title: '编辑商品' }
         },
         {
+          path: 'products/view/:id',
+          name: 'system.products.view',
+          component: () => import('@/views/system/products/ProductDetail.vue'),
+          meta: { requiresAuth: true, title: '查看商品详情' }
+        },
+        {
           path: 'categories',
           name: 'system.categories',
           component: () => import('@/views/system/products/CategoryManagement.vue'),

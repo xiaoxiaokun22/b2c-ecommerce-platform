@@ -183,8 +183,8 @@
       <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
-          v-model:current-page="pagination.page"
-          v-model:page-size="pagination.size"
+          :current-page="pagination.page"
+          :page-size="pagination.size"
           :total="pagination.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
@@ -259,6 +259,160 @@ const pagination = reactive({
   total: 0
 })
 
+// 完整的mock数据
+const allMockData: Product[] = [
+  {
+    id: 1,
+    name: 'iPhone 15 Pro Max',
+    categoryId: 111,
+    categoryName: '电子产品 > 手机 > iPhone',
+    brand: 'Apple',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 3,
+    minPrice: 9999,
+    maxPrice: 12999,
+    totalStock: 150,
+    sales: 1234,
+    status: 'active',
+    createdAt: '2024-01-01 10:00:00'
+  },
+  {
+    id: 2,
+    name: 'Samsung Galaxy S24 Ultra',
+    categoryId: 112,
+    categoryName: '电子产品 > 手机 > Android手机',
+    brand: 'Samsung',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 2,
+    minPrice: 8999,
+    maxPrice: 10999,
+    totalStock: 80,
+    sales: 567,
+    status: 'active',
+    createdAt: '2024-01-02 11:00:00'
+  },
+  {
+    id: 3,
+    name: 'MacBook Pro 16"',
+    categoryId: 12,
+    categoryName: '电子产品 > 电脑',
+    brand: 'Apple',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 4,
+    minPrice: 19999,
+    maxPrice: 29999,
+    totalStock: 45,
+    sales: 234,
+    status: 'active',
+    createdAt: '2024-01-03 12:00:00'
+  },
+  {
+    id: 4,
+    name: '小米14 Pro',
+    categoryId: 113,
+    categoryName: '电子产品 > 手机 > 小米',
+    brand: 'Xiaomi',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 3,
+    minPrice: 4999,
+    maxPrice: 6999,
+    totalStock: 200,
+    sales: 890,
+    status: 'active',
+    createdAt: '2024-01-06 15:00:00'
+  },
+  {
+    id: 5,
+    name: '华为Mate 60 Pro',
+    categoryId: 114,
+    categoryName: '电子产品 > 手机 > 华为',
+    brand: 'Huawei',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 2,
+    minPrice: 6999,
+    maxPrice: 8999,
+    totalStock: 120,
+    sales: 456,
+    status: 'active',
+    createdAt: '2024-01-07 16:00:00'
+  },
+  {
+    id: 6,
+    name: '戴尔XPS 15',
+    categoryId: 13,
+    categoryName: '电子产品 > 电脑',
+    brand: 'Dell',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 3,
+    minPrice: 12999,
+    maxPrice: 18999,
+    totalStock: 65,
+    sales: 123,
+    status: 'active',
+    createdAt: '2024-01-08 09:00:00'
+  },
+  {
+    id: 7,
+    name: '男士T恤',
+    categoryId: 21,
+    categoryName: '服装 > 男装',
+    brand: 'Uniqlo',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 5,
+    minPrice: 99,
+    maxPrice: 199,
+    totalStock: 500,
+    sales: 3456,
+    status: 'inactive',
+    createdAt: '2024-01-04 13:00:00'
+  },
+  {
+    id: 8,
+    name: '女士连衣裙',
+    categoryId: 22,
+    categoryName: '服装 > 女装',
+    brand: 'Zara',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 8,
+    minPrice: 299,
+    maxPrice: 799,
+    totalStock: 200,
+    sales: 789,
+    status: 'draft',
+    createdAt: '2024-01-05 14:00:00'
+  },
+  {
+    id: 9,
+    name: 'Nike运动鞋',
+    categoryId: 31,
+    categoryName: '运动 > 鞋类',
+    brand: 'Nike',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 6,
+    minPrice: 599,
+    maxPrice: 1299,
+    totalStock: 300,
+    sales: 2345,
+    status: 'active',
+    createdAt: '2024-01-09 10:00:00'
+  },
+  {
+    id: 10,
+    name: 'Adidas运动服',
+    categoryId: 32,
+    categoryName: '运动 > 服装',
+    brand: 'Adidas',
+    mainImage: 'https://via.placeholder.com/60x60',
+    skuCount: 4,
+    minPrice: 299,
+    maxPrice: 599,
+    totalStock: 400,
+    sales: 1567,
+    status: 'active',
+    createdAt: '2024-01-10 11:00:00'
+  }
+]
+
 // 方法
 const loadProducts = async () => {
   loading.value = true
@@ -270,87 +424,47 @@ const loadProducts = async () => {
     //   size: pagination.size
     // })
 
-    // 模拟数据
-    const mockData: Product[] = [
-      {
-        id: 1,
-        name: 'iPhone 15 Pro Max',
-        categoryId: 111,
-        categoryName: '电子产品 > 手机 > iPhone',
-        brand: 'Apple',
-        mainImage: 'https://via.placeholder.com/60x60',
-        skuCount: 3,
-        minPrice: 9999,
-        maxPrice: 12999,
-        totalStock: 150,
-        sales: 1234,
-        status: 'active',
-        createdAt: '2024-01-01 10:00:00'
-      },
-      {
-        id: 2,
-        name: 'Samsung Galaxy S24 Ultra',
-        categoryId: 112,
-        categoryName: '电子产品 > 手机 > Android手机',
-        brand: 'Samsung',
-        mainImage: 'https://via.placeholder.com/60x60',
-        skuCount: 2,
-        minPrice: 8999,
-        maxPrice: 10999,
-        totalStock: 80,
-        sales: 567,
-        status: 'active',
-        createdAt: '2024-01-02 11:00:00'
-      },
-      {
-        id: 3,
-        name: 'MacBook Pro 16"',
-        categoryId: 12,
-        categoryName: '电子产品 > 电脑',
-        brand: 'Apple',
-        mainImage: 'https://via.placeholder.com/60x60',
-        skuCount: 4,
-        minPrice: 19999,
-        maxPrice: 29999,
-        totalStock: 45,
-        sales: 234,
-        status: 'active',
-        createdAt: '2024-01-03 12:00:00'
-      },
-      {
-        id: 4,
-        name: '男士T恤',
-        categoryId: 21,
-        categoryName: '服装 > 男装',
-        brand: 'Uniqlo',
-        mainImage: 'https://via.placeholder.com/60x60',
-        skuCount: 5,
-        minPrice: 99,
-        maxPrice: 199,
-        totalStock: 500,
-        sales: 3456,
-        status: 'inactive',
-        createdAt: '2024-01-04 13:00:00'
-      },
-      {
-        id: 5,
-        name: '女士连衣裙',
-        categoryId: 22,
-        categoryName: '服装 > 女装',
-        brand: 'Zara',
-        mainImage: 'https://via.placeholder.com/60x60',
-        skuCount: 8,
-        minPrice: 299,
-        maxPrice: 799,
-        totalStock: 200,
-        sales: 789,
-        status: 'draft',
-        createdAt: '2024-01-05 14:00:00'
-      }
-    ]
+    // 使用mock数据并应用搜索过滤
+    let filteredData = [...allMockData]
 
-    tableData.value = mockData
-    pagination.total = 100
+    // 按商品名称过滤
+    if (searchForm.name) {
+      filteredData = filteredData.filter(product =>
+        product.name.toLowerCase().includes(searchForm.name.toLowerCase())
+      )
+    }
+
+    // 按分类过滤
+    if (searchForm.categoryId) {
+      filteredData = filteredData.filter(product =>
+        product.categoryId === searchForm.categoryId
+      )
+    }
+
+    // 按状态过滤
+    if (searchForm.status) {
+      filteredData = filteredData.filter(product =>
+        product.status === searchForm.status
+      )
+    }
+
+    // 按品牌过滤
+    if (searchForm.brand) {
+      filteredData = filteredData.filter(product =>
+        product.brand.toLowerCase().includes(searchForm.brand.toLowerCase())
+      )
+    }
+
+    // 计算分页
+    const startIndex = (pagination.page - 1) * pagination.size
+    const endIndex = startIndex + pagination.size
+    tableData.value = filteredData.slice(startIndex, endIndex)
+    pagination.total = filteredData.length
+
+    // 显示搜索结果提示
+    if (searchForm.name || searchForm.categoryId || searchForm.status || searchForm.brand) {
+      ElMessage.success(`找到 ${pagination.total} 个符合条件的商品`)
+    }
   } catch (error) {
     ElMessage.error('加载商品数据失败')
   } finally {
@@ -360,7 +474,7 @@ const loadProducts = async () => {
 
 const loadCategories = async () => {
   try {
-    // 模拟数据
+    // 模拟数据，与mock商品数据匹配
     const mockCategories: Category[] = [
       {
         id: 1,
@@ -371,10 +485,14 @@ const loadCategories = async () => {
             name: '手机',
             children: [
               { id: 111, name: 'iPhone' },
-              { id: 112, name: 'Android手机' }
+              { id: 112, name: 'Android手机' },
+              { id: 113, name: '小米' },
+              { id: 114, name: '华为' }
             ]
           },
-          { id: 12, name: '电脑' }
+          { id: 12, name: '电脑', children: [
+            { id: 13, name: '笔记本' }
+          ] }
         ]
       },
       {
@@ -383,6 +501,14 @@ const loadCategories = async () => {
         children: [
           { id: 21, name: '男装' },
           { id: 22, name: '女装' }
+        ]
+      },
+      {
+        id: 3,
+        name: '运动',
+        children: [
+          { id: 31, name: '鞋类' },
+          { id: 32, name: '服装' }
         ]
       }
     ]
@@ -425,7 +551,7 @@ const handleEdit = (row: Product) => {
 }
 
 const handleView = (row: Product) => {
-  ElMessage.info(`查看商品详情：${row.name}`)
+  router.push(`/system/products/view/${row.id}`)
 }
 
 const handleToggleStatus = async (row: Product) => {
