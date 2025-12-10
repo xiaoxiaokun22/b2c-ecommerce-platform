@@ -22,12 +22,18 @@
         v-loading="loading"
         border
       >
-        <el-table-column prop="name" label="分类名称" min-width="200">
+        <el-table-column prop="name" label="分类名称" min-width="300">
           <template #default="{ row }">
             <div class="category-name">
-              <el-avatar v-if="row.icon" :size="30" :src="row.icon" />
+              <el-avatar v-if="row.icon" :size="24" :src="row.icon" />
               <el-icon v-else :size="20" color="#909399"><Files /></el-icon>
-              <span>{{ row.name }}</span>
+              <span class="name-text">{{ row.name }}</span>
+              <el-tag v-if="getCategoryLevel(row) === 1" type="primary" size="small" class="level-tag">一级</el-tag>
+              <el-tag v-else-if="getCategoryLevel(row) === 2" type="success" size="small" class="level-tag">二级</el-tag>
+              <el-tag v-else type="warning" size="small" class="level-tag">三级</el-tag>
+            </div>
+            <div class="category-path" v-if="getCategoryPath(row).length > 1">
+              {{ getCategoryPath(row).join(' > ') }}
             </div>
           </template>
         </el-table-column>
@@ -330,6 +336,37 @@ const flattenCategories = (categories: Category[]): Category[] => {
   return result
 }
 
+// 获取分类路径
+const getCategoryPath = (category: Category): string[] => {
+  const path: string[] = [category.name]
+  const parent = getParentCategory(category)
+  if (parent) {
+    const parentPath = getCategoryPath(parent)
+    return [...parentPath, ...path]
+  }
+  return path
+}
+
+// 获取分类层级
+const getCategoryLevel = (category: Category): number => {
+  if (!category.parentId) return 1
+
+  // 在扁平数据中查找父分类
+  const parent = flatCategories.value.find(cat => cat.id === category.parentId)
+  if (!parent) return 1
+
+  // 递归获取父分类的层级
+  return getCategoryLevel(parent) + 1
+}
+
+// 获取父分类
+const getParentCategory = (category: Category): Category | null => {
+  if (!category.parentId) return null
+
+  // 在扁平数据中查找，更可靠
+  return flatCategories.value.find(cat => cat.id === category.parentId) || null
+}
+
 const handleAdd = () => {
   resetForm()
   isEditingRoot.value = true
@@ -499,6 +536,23 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+.name-text {
+  font-weight: 500;
+  color: #303133;
+}
+
+.level-tag {
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.category-path {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+  padding-left: 32px;
+}
+
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
@@ -507,6 +561,28 @@ onMounted(() => {
 
 :deep(.el-table__row .el-table__cell) {
   padding: 12px 0;
+}
+
+/* 优化树形表格的缩进 */
+:deep(.el-table__expand-icon) {
+  margin-right: 8px;
+}
+
+:deep(.el-table__indent) {
+  padding-left: 20px !important;
+}
+
+:deep(.el-table__expand-column .cell) {
+  padding-left: 12px !important;
+}
+
+/* 子分类行的背景色区分 */
+:deep(.el-table__row--level-1) {
+  background-color: #fafafa;
+}
+
+:deep(.el-table__row--level-2) {
+  background-color: #f5f5f5;
 }
 
 :deep(.el-cascader) {
