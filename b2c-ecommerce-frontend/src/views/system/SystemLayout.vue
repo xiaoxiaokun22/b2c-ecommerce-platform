@@ -12,18 +12,25 @@
           router
           unique-opened
         >
-          <el-menu-item index="/system/users">
-            <el-icon><User /></el-icon>
-            <span>用户管理</span>
-          </el-menu-item>
-          <el-menu-item index="/system/roles">
-            <el-icon><UserFilled /></el-icon>
-            <span>角色管理</span>
-          </el-menu-item>
-          <el-menu-item index="/system/permissions">
-            <el-icon><Lock /></el-icon>
-            <span>权限管理</span>
-          </el-menu-item>
+          <!-- 系统管理模块 -->
+          <el-sub-menu index="system-management">
+            <template #title>
+              <el-icon><Setting /></el-icon>
+              <span>系统管理</span>
+            </template>
+            <el-menu-item index="/system/users">
+              <el-icon><User /></el-icon>
+              <span>用户管理</span>
+            </el-menu-item>
+            <el-menu-item index="/system/roles">
+              <el-icon><UserFilled /></el-icon>
+              <span>角色管理</span>
+            </el-menu-item>
+            <el-menu-item index="/system/permissions">
+              <el-icon><Lock /></el-icon>
+              <span>权限管理</span>
+            </el-menu-item>
+          </el-sub-menu>
 
           <!-- 商品管理模块 -->
           <el-sub-menu index="products">
@@ -297,90 +304,146 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #304156;
-  color: white;
-  border-bottom: 1px solid #1a2533;
+  background-color: #343e4f;
+  color: #ffffff;
+  border-bottom: 1px solid #3d495c;
 }
 
 .system-header h2 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 10px;
+  letter-spacing: 0.5px;
 }
 
 .system-menu {
   border-right: none;
-  background-color: #304156;
+  background-color: #3d495c;
 }
 
-/* 顶级菜单项样式 */
+/* 菜单项样式 - 简洁清晰设计 */
 .system-menu .el-menu-item {
-  color: #ff9800 !important;
-  border-bottom: 1px solid #1a2533;
-  background-color: transparent !important;
+  padding-left: 45px !important;
+  font-size: 15px !important;
+  color: #f0f2f5 !important;
+  border: none !important;
+  background: transparent !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  transition: all 0.2s ease !important;
 }
 
 .system-menu .el-menu-item:hover {
-  background-color: #263445 !important;
-  color: #ff9800 !important;
+  background-color: #4a5568 !important;
+  color: #ffffff !important;
 }
 
 .system-menu .el-menu-item.is-active {
-  background-color: #ff9800 !important;
-  color: white !important;
+  background-color: #409eff !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  position: relative !important;
+}
+
+.system-menu .el-menu-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #ffffff;
 }
 
 /* 子菜单标题样式 */
 .system-menu .el-sub-menu__title {
-  color: #ff9800 !important;
-  border-bottom: 1px solid #1a2533;
-  background-color: transparent !important;
+  color: #ffffff !important;
+  border: none !important;
+  background: transparent !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  transition: all 0.2s ease !important;
 }
 
 .system-menu .el-sub-menu__title:hover {
-  background-color: #263445 !important;
-  color: #ff9800 !important;
+  background-color: #4a5568 !important;
+  color: #ffffff !important;
 }
 
 .system-menu .el-sub-menu.is-opened .el-sub-menu__title {
-  color: #ff9800 !important;
+  color: #409eff !important;
+  font-weight: 600 !important;
 }
 
-/* 子菜单项样式 - 使用更强的选择器确保样式生效 */
+/* 商品管理菜单特殊样式 */
+.system-menu .el-sub-menu[index="products"] .el-sub-menu__title {
+  color: #ffffff !important;
+}
+
+.system-menu .el-sub-menu[index="products"]:hover .el-sub-menu__title {
+  color: #ffffff !important;
+}
+
+.system-menu .el-sub-menu[index="products"].is-opened .el-sub-menu__title {
+  color: #409eff !important;
+}
+
+/* 箭头样式 */
+.system-menu .el-sub-menu__title .el-sub-menu__icon-arrow {
+  color: #ffffff !important;
+  transition: transform 0.2s ease !important;
+  opacity: 0.8 !important;
+}
+
+.system-menu .el-sub-menu.is-opened .el-sub-menu__title .el-sub-menu__icon-arrow {
+  color: #409eff !important;
+  transform: rotateZ(180deg) !important;
+  opacity: 1 !important;
+}
+
+
+/* 图标样式 - 简洁设计 */
+.system-menu .el-menu-item .el-icon,
+.system-menu .el-sub-menu__title .el-icon {
+  margin-right: 10px !important;
+  font-size: 16px !important;
+  color: inherit !important;
+}
+
+/* 文字样式 - 清晰易读 */
+.system-menu .el-menu-item span,
+.system-menu .el-sub-menu__title span {
+  font-size: 15px !important;
+  color: inherit !important;
+}
+
+/* 子菜单样式 */
+.system-menu .el-sub-menu .el-menu {
+  background-color: #343e4f !important;
+  border: none !important;
+}
+
+/* 子菜单项样式 */
 .system-menu .el-sub-menu .el-menu-item {
-  padding-left: 45px !important;
-  font-size: 14px !important;
-  color: #bfcbd9 !important;
-  background-color: transparent !important;
+  background-color: #343e4f !important;
+  color: #d0d5dc !important;
+  padding-left: 60px !important;
 }
 
 .system-menu .el-sub-menu .el-menu-item:hover {
-  background-color: #263445 !important;
-  color: white !important;
+  background-color: #3d495c !important;
+  color: #ffffff !important;
 }
 
 .system-menu .el-sub-menu .el-menu-item.is-active {
   background-color: #409eff !important;
-  color: white !important;
-}
-
-/* 图标样式统一 */
-.system-menu .el-menu-item .el-icon,
-.system-menu .el-sub-menu__title .el-icon,
-.system-menu .el-sub-menu .el-menu-item .el-icon {
-  margin-right: 6px;
-  font-size: 16px;
-}
-
-/* 文字样式统一 */
-.system-menu .el-menu-item span,
-.system-menu .el-sub-menu__title span,
-.system-menu .el-sub-menu .el-menu-item span {
-  font-size: 14px;
+  color: #ffffff !important;
 }
 
 .header-content {
