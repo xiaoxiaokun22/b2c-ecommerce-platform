@@ -176,6 +176,7 @@
             <el-form-item label="活动状态" prop="status">
               <el-radio-group v-model="formData.status">
                 <el-radio label="draft">草稿</el-radio>
+                <el-radio label="waiting">待开始</el-radio>
                 <el-radio label="active">激活</el-radio>
                 <el-radio label="inactive">停用</el-radio>
               </el-radio-group>

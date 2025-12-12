@@ -240,6 +240,24 @@ const router = createRouter({
           meta: { requiresAuth: true, title: '创建团购活动' }
         },
         {
+          path: 'group-buying/:id',
+          name: 'system.group-buying.detail',
+          component: () => import('@/views/system/marketing/GroupBuyingDetail.vue'),
+          meta: { requiresAuth: true, title: '团购活动详情' }
+        },
+        {
+          path: 'group-buying/:id/groups',
+          name: 'system.group-buying.groups',
+          component: () => import('@/views/system/marketing/GroupBuyingGroupList.vue'),
+          meta: { requiresAuth: true, title: '团购列表' }
+        },
+        {
+          path: 'group-buying/:id/groups/:groupId/orders',
+          name: 'system.group-buying.orders',
+          component: () => import('@/views/system/marketing/GroupBuyingOrderList.vue'),
+          meta: { requiresAuth: true, title: '团购订单' }
+        },
+        {
           path: 'marketing-analysis',
           name: 'system.marketing-analysis',
           component: () => import('@/views/system/marketing/MarketingAnalysis.vue'),

@@ -97,8 +97,10 @@
             clearable
             style="width: 120px"
           >
+            <el-option label="草稿" value="draft" />
             <el-option label="待开始" value="waiting" />
             <el-option label="进行中" value="active" />
+            <el-option label="已停用" value="inactive" />
             <el-option label="已结束" value="ended" />
           </el-select>
         </el-form-item>
@@ -253,9 +255,6 @@
                   <el-dropdown-item command="orders">
                     查看订单
                   </el-dropdown-item>
-                  <el-dropdown-item command="copy">
-                    复制活动
-                  </el-dropdown-item>
                   <el-dropdown-item
                     v-if="row.status === 'waiting'"
                     command="delete"
@@ -283,6 +282,44 @@
         />
       </div>
     </el-card>
+
+    <!-- 详情对话框 -->
+    <el-dialog
+      v-model="detailVisible"
+      title="团购活动详情"
+      width="80%"
+      :destroy-on-close="true"
+    >
+      <GroupBuyingDetail v-if="detailVisible && selectedGroupBuying" :group-buying="selectedGroupBuying" />
+    </el-dialog>
+
+    <!-- 团列表对话框 -->
+    <el-dialog
+      v-model="groupListVisible"
+      :title="`${selectedGroupBuyingForGroups?.name} - 团购列表`"
+      width="90%"
+      :destroy-on-close="true"
+      top="5vh"
+    >
+      <GroupBuyingGroupList
+        v-if="groupListVisible && selectedGroupBuyingForGroups"
+        :group-buying-activity="selectedGroupBuyingForGroups"
+      />
+    </el-dialog>
+
+    <!-- 订单列表对话框 -->
+    <el-dialog
+      v-model="orderListVisible"
+      :title="`${selectedGroupBuyingForOrders?.name} - 订单列表`"
+      width="95%"
+      :destroy-on-close="true"
+      top="5vh"
+    >
+      <GroupBuyingOrderList
+        v-if="orderListVisible && selectedGroupBuyingForOrders"
+        :group-buying-activity="selectedGroupBuyingForOrders"
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -295,12 +332,27 @@ import {
   ShoppingCart, Money, User, Clock, Flag, ArrowDown
 } from '@element-plus/icons-vue'
 import { mockGroupBuyingActivities } from '@/mock/marketing'
+import GroupBuyingDetail from './GroupBuyingDetail.vue'
+import GroupBuyingGroupList from './GroupBuyingGroupList.vue'
+import GroupBuyingOrderList from './GroupBuyingOrderList.vue'
 
 const router = useRouter()
 
 // 响应式数据
 const loading = ref(false)
 const tableData = ref<any[]>([])
+
+// 详情对话框
+const detailVisible = ref(false)
+const selectedGroupBuying = ref<any>(null)
+
+// 团列表对话框
+const groupListVisible = ref(false)
+const selectedGroupBuyingForGroups = ref<any>(null)
+
+// 订单列表对话框
+const orderListVisible = ref(false)
+const selectedGroupBuyingForOrders = ref<any>(null)
 
 // 搜索表单
 const searchForm = reactive({
@@ -358,7 +410,9 @@ const getStatusType = (status: string) => {
   const typeMap: Record<string, string> = {
     waiting: 'info',
     active: 'success',
-    ended: 'danger'
+    ended: 'danger',
+    draft: 'warning',
+    inactive: 'info'
   }
   return typeMap[status] || 'info'
 }
@@ -368,7 +422,9 @@ const getStatusText = (status: string) => {
   const textMap: Record<string, string> = {
     waiting: '待开始',
     active: '进行中',
-    ended: '已结束'
+    ended: '已结束',
+    draft: '草稿',
+    inactive: '已停用'
   }
   return textMap[status] || '未知'
 }
@@ -464,7 +520,8 @@ const handleEdit = (row: any) => {
 
 // 查看详情
 const handleView = (row: any) => {
-  ElMessage.info(`查看团购活动详情: ${row.name}`)
+  selectedGroupBuying.value = row
+  detailVisible.value = true
 }
 
 // 处理下拉菜单命令
@@ -476,9 +533,6 @@ const handleCommand = (command: string, row: any) => {
     case 'orders':
       handleViewOrders(row)
       break
-    case 'copy':
-      handleCopyActivity(row)
-      break
     case 'delete':
       handleDeleteActivity(row)
       break
@@ -487,18 +541,14 @@ const handleCommand = (command: string, row: any) => {
 
 // 查看团列表
 const handleViewGroups = (row: any) => {
-  ElMessage.info(`查看团列表: ${row.name}`)
+  selectedGroupBuyingForGroups.value = row
+  groupListVisible.value = true
 }
 
 // 查看订单
 const handleViewOrders = (row: any) => {
-  ElMessage.info(`查看团购订单: ${row.name}`)
-}
-
-// 复制活动
-const handleCopyActivity = (row: any) => {
-  ElMessage.success(`复制团购活动: ${row.name}`)
-  router.push(`/system/group-buying/create?copy=${row.id}`)
+  selectedGroupBuyingForOrders.value = row
+  orderListVisible.value = true
 }
 
 // 删除活动
