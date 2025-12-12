@@ -236,8 +236,8 @@
       <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
-          v-model:current-page="pagination.current"
-          v-model:page-size="pagination.pageSize"
+          :current-page="pagination.current"
+          :page-size="pagination.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           :total="pagination.total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -350,6 +350,17 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 数据统计对话框 -->
+    <el-dialog
+      v-model="statisticsVisible"
+      :title="`${selectedCoupon?.name} - 数据统计`"
+      width="90%"
+      :before-close="handleCloseStatistics"
+      top="5vh"
+    >
+      <coupon-statistics v-if="selectedCoupon" :coupon="selectedCoupon" />
+    </el-dialog>
   </div>
 </template>
 
@@ -362,6 +373,7 @@ import {
   ShoppingCart, Clock, ArrowDown
 } from '@element-plus/icons-vue'
 import { mockCoupons } from '@/mock/marketing'
+import CouponStatistics from './CouponStatistics.vue'
 
 const router = useRouter()
 
@@ -534,6 +546,7 @@ const handleEdit = (row: any) => {
 
 // 详情对话框相关
 const detailVisible = ref(false)
+const statisticsVisible = ref(false)
 const selectedCoupon = ref<any>(null)
 
 // 查看详情
@@ -562,7 +575,8 @@ const handleCommand = async (command: string, row: any) => {
 
 // 查看统计
 const handleViewStatistics = (row: any) => {
-  ElMessage.info(`查看优惠券统计: ${row.name}`)
+  selectedCoupon.value = row
+  statisticsVisible.value = true
 }
 
 // 获取优惠券类型标签样式
@@ -588,6 +602,12 @@ const getCouponTypeText = (type: string) => {
 // 关闭详情对话框
 const handleCloseDetail = () => {
   detailVisible.value = false
+  selectedCoupon.value = null
+}
+
+// 关闭统计对话框
+const handleCloseStatistics = () => {
+  statisticsVisible.value = false
   selectedCoupon.value = null
 }
 
