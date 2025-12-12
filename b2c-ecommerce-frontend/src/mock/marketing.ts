@@ -227,6 +227,10 @@ export const mockSeckillActivities = [
         ]
       }
     ],
+    status: 'active', // draft, active, inactive, ended
+    description: '今日限时秒杀活动，超值商品抢购中！',
+    recommended: true,
+    rules: ['limit_per_user', 'no_discount'],
     creator: '秒杀运营',
     createTime: '2024-01-09 18:00:00'
   },
@@ -254,8 +258,52 @@ export const mockSeckillActivities = [
         ]
       }
     ],
+    status: 'active', // draft, active, inactive, ended
+    description: '明日秒杀预告，精彩商品抢先看！',
+    recommended: false,
+    rules: ['limit_per_user'],
     creator: '秒杀运营',
     createTime: '2024-01-10 09:00:00'
+  },
+  {
+    id: 'SECKILL003',
+    name: '昨日秒杀场',
+    date: '2024-01-09',
+    sessions: [
+      {
+        id: 'SESSION005',
+        name: '20点场',
+        startTime: '20:00:00',
+        endTime: '20:30:00',
+        status: 'ended',
+        products: [
+          {
+            productId: 'PRD009',
+            productName: 'Nintendo Switch OLED',
+            originalPrice: 2599,
+            seckillPrice: 1999,
+            stock: 100,
+            sold: 100,
+            imageUrl: '/images/products/switch.jpg'
+          },
+          {
+            productId: 'PRD010',
+            productName: '索尼PS5光驱版',
+            originalPrice: 3899,
+            seckillPrice: 3099,
+            stock: 50,
+            sold: 45,
+            imageUrl: '/images/products/ps5.jpg'
+          }
+        ]
+      }
+    ],
+    status: 'ended', // draft, active, inactive, ended
+    description: '昨日秒杀活动已结束，敬请关注今日活动！',
+    recommended: false,
+    rules: ['limit_per_user', 'no_discount', 'no_points'],
+    creator: '秒杀运营',
+    createTime: '2024-01-08 15:00:00'
   }
 ]
 

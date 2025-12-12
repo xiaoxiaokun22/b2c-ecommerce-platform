@@ -129,77 +129,9 @@
         v-loading="loading"
         :data="tableData"
         style="width: 100%"
-        row-key="id"
-        :expand-row-keys="expandedRows"
-        @expand-change="handleExpandChange"
       >
-        <el-table-column type="expand">
-          <template #default="{ row }">
-            <div class="expand-content">
-              <h4>秒杀商品列表</h4>
-              <el-table :data="row.sessions" border>
-                <el-table-column label="场次时间" width="150">
-                  <template #default="{ row: session }">
-                    {{ session.startTime }} - {{ session.endTime }}
-                  </template>
-                </el-table-column>
-                <el-table-column label="商品" min-width="300">
-                  <template #default="{ row: session }">
-                    <div
-                      v-for="product in session.products"
-                      :key="product.productId"
-                      class="product-item"
-                    >
-                      <el-image
-                        :src="product.imageUrl"
-                        fit="cover"
-                        style="width: 60px; height: 60px; margin-right: 10px;"
-                      />
-                      <div class="product-info">
-                        <div class="product-name">{{ product.productName }}</div>
-                        <div class="price-info">
-                          <span class="original-price">¥{{ product.originalPrice }}</span>
-                          <span class="seckill-price">¥{{ product.seckillPrice }}</span>
-                          <span class="discount">
-                            {{ Math.round((1 - product.seckillPrice / product.originalPrice) * 100) }}%OFF
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column label="库存/销量" width="150">
-                  <template #default="{ row: session }">
-                    <div
-                      v-for="product in session.products"
-                      :key="product.productId"
-                      class="stock-info"
-                    >
-                      {{ product.sold }} / {{ product.stock }}
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column label="进度" width="150">
-                  <template #default="{ row: session }">
-                    <div
-                      v-for="product in session.products"
-                      :key="product.productId"
-                      style="margin-bottom: 10px;"
-                    >
-                      <el-progress
-                        :percentage="Math.round((product.sold / product.stock) * 100)"
-                        :color="getProgressColor(Math.round((product.sold / product.stock) * 100))"
-                        :stroke-width="6"
-                      />
-                    </div>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </div>
-          </template>
-        </el-table-column>
         <el-table-column prop="date" label="活动日期" width="120" />
-        <el-table-column label="场次信息" width="200">
+        <el-table-column label="场次信息" width="160">
           <template #default="{ row }">
             <div class="session-summary">
               <div>{{ row.sessions.length }}个场次</div>
@@ -207,7 +139,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="活动状态" width="120">
+        <el-table-column label="活动状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getActivityStatusType(row)">
               {{ getActivityStatusText(row) }}
@@ -224,7 +156,7 @@
         </el-table-column>
         <el-table-column prop="creator" label="创建人" width="100" />
         <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleEdit(row)">
               编辑
@@ -232,37 +164,15 @@
             <el-button type="info" size="small" @click="handleView(row)">
               详情
             </el-button>
-            <el-dropdown @command="(command) => handleCommand(command, row)">
-              <el-button size="small" type="warning">
-                更多<el-icon class="el-icon--right"><ArrowDown /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="copy">
-                    复制活动
-                  </el-dropdown-item>
-                  <el-dropdown-item command="export">
-                    导出数据
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    v-if="isActivityEditable(row)"
-                    command="delete"
-                    divided
-                  >
-                    删除活动
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </template>
+            </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
-          v-model:current-page="pagination.current"
-          v-model:page-size="pagination.pageSize"
+          :current-page="pagination.current"
+          :page-size="pagination.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           :total="pagination.total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -271,6 +181,17 @@
         />
       </div>
     </el-card>
+
+    <!-- 详情对话框 -->
+    <el-dialog
+      v-model="detailVisible"
+      title="秒杀活动详情"
+      width="90%"
+      :before-close="handleCloseDetail"
+      top="5vh"
+    >
+      <seckill-detail v-if="selectedActivity" :seckill-activity="selectedActivity" />
+    </el-dialog>
   </div>
 </template>
 
@@ -279,29 +200,33 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  Plus, Refresh, Search, RefreshLeft, ArrowDown
+  Plus, Refresh, Search, RefreshLeft
 } from '@element-plus/icons-vue'
 import { mockSeckillActivities } from '@/mock/marketing'
+import SeckillDetail from './SeckillDetail.vue'
 
 const router = useRouter()
 
 // 响应式数据
 const loading = ref(false)
 const tableData = ref<any[]>([])
-const expandedRows = ref<string[]>([])
-
-// 搜索表单
-const searchForm = reactive({
-  date: '',
-  sessionStatus: '',
-  productName: ''
-})
 
 // 分页
 const pagination = reactive({
   current: 1,
   pageSize: 20,
   total: 0
+})
+
+// 详情对话框相关
+const detailVisible = ref(false)
+const selectedActivity = ref<any>(null)
+
+// 搜索表单
+const searchForm = reactive({
+  date: '',
+  sessionStatus: '',
+  productName: ''
 })
 
 // 当前日期
@@ -513,46 +438,17 @@ const handleEdit = (row: any) => {
 
 // 查看详情
 const handleView = (row: any) => {
-  ElMessage.info(`查看秒杀活动详情: ${row.date}`)
+  selectedActivity.value = row
+  detailVisible.value = true
 }
 
-// 处理展开行变化
-const handleExpandChange = (row: any, expanded: boolean) => {
-  if (expanded) {
-    expandedRows.value.push(row.id)
-  } else {
-    const index = expandedRows.value.indexOf(row.id)
-    if (index > -1) {
-      expandedRows.value.splice(index, 1)
-    }
-  }
+
+// 关闭详情对话框
+const handleCloseDetail = () => {
+  detailVisible.value = false
+  selectedActivity.value = null
 }
 
-// 处理下拉菜单命令
-const handleCommand = async (command: string, row: any) => {
-  switch (command) {
-    case 'copy':
-      handleCopyActivity(row)
-      break
-    case 'export':
-      handleExportData(row)
-      break
-    case 'delete':
-      await handleDeleteActivity(row)
-      break
-  }
-}
-
-// 复制活动
-const handleCopyActivity = (row: any) => {
-  ElMessage.success(`复制秒杀活动: ${row.date}`)
-  router.push(`/system/seckill/create?copy=${row.id}`)
-}
-
-// 导出数据
-const handleExportData = (row: any) => {
-  ElMessage.success(`导出秒杀数据: ${row.date}`)
-}
 
 // 删除活动
 const handleDeleteActivity = async (row: any) => {
